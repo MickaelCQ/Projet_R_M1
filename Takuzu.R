@@ -1,13 +1,23 @@
+#' @title Application Shiny Takuzu
+#' @description An application Shiny for play at Takuzu with differently option of the difficulties 
+#' @author Mickael Coquerelle & Loik Galtier
+#' @import shiny # Add library
+#' @export
+
 library(shiny)
 
+#Fonction checkboxGroupINPUT( pour les checkbox)
 ######################################################################################################
 #                                   Interface Layout
 ######################################################################################################
 
+#' @title Interface uuser (UI)
+#' @description Défine the interface user of the shiny application
+#' @return An UI object for apply Shiny
 ui <- fluidPage(
-  titlePanel("Bienvenue sur l'application Takuzu "),
+  titlePanel("Welcome to LM~Takuzu"),
   
-  # Style CSS personnalisé
+  # Style CSS personalised
   tags$style(HTML("
     body {
       background-image: url('home/mickael/Belette.jpg'); /* Ou une image */
@@ -33,7 +43,8 @@ ui <- fluidPage(
       box-shadow: 3px 3px 20px rgba(0, 0, 0, 0.5);}
     
   ")),  
-  # Mise en page avec une barre latérale et un panneau principal
+  
+  # Main page
   sidebarLayout(
     sidebarPanel(
       # Sélecteur pour la taille de la matrice
@@ -41,7 +52,7 @@ ui <- fluidPage(
                   choices = c("6 X 6", "8 X 8", "Custom"),
                   selected = "6 X 6"),
       
-      # Sélecteur pour le niveau de difficulté
+      # select level difficulty
       selectInput("Difficulty", "Niveau de difficulté", 
                   choices = c("Facile", "Moyen", "Difficile", "Impossible"),
                   selected = "Facile"),
@@ -53,7 +64,7 @@ ui <- fluidPage(
     ),
     
     mainPanel(
-      # Affichage de la grille en fonction de la sélection
+      # Display agrid according to selection
       uiOutput("grille_matrice")
     )
   )
@@ -62,21 +73,31 @@ ui <- fluidPage(
 ######################################################################################################
 #                                   Server Logic
 ######################################################################################################
+
+#' @title Application server.
+#' @description Défine server logic  and display game matrix.
+#' @param input List of user inputs.
+#' @param output List of dynamically displayed items.
+#' @return An object server for shiny.
 server <- function(input, output) {
   
+  #' @title Generate the takuzu grid
+  #' @description Generates an interactive grid of buttons based on the size selected by the user.
+  #' @return  UI dynamic  display of grid matrix 6x6, 8x8 or custom
   output$grille_matrice <- renderUI({
     # Déterminer la taille de la grille selon la sélection
+    # Define grid size according to selection
     size <- switch(input$Matrice_size,
                    "6 X 6" = 6,
                    "8 X 8" = 8,
-                   "Custom" = 10)  # Exemple de taille personnalisée
+                   "Custom" = 10)  # Example of size personalised
     
-    # Créer la matrice sous forme de grille de boutons
+    # Create a button grid matrix
     grid <- lapply(1:size^2, function(i) {
       actionButton(paste("cell", i, sep = "_"), label = "", class = "btn-custom")
     })
     
-    # Organiser les boutons dans une grille CSS
+    # Organizing buttons in a matrix
     div(class = "matrice", grid)
   })
 }
@@ -84,5 +105,7 @@ server <- function(input, output) {
 ######################################################################################################
 #                                    Run the application
 ######################################################################################################
-shinyApp(ui = ui, server = server)
 
+#' @title Application launch
+#' @description Starts the shiny application with the previously defined user interface and server.
+shinyApp(ui = ui, server = server)
