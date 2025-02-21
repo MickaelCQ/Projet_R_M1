@@ -66,11 +66,11 @@ server <- function(input, output, session) {
   
   
   output$bc_value <- renderText({
-    y() * y() * 5
+    y() * y() * 3
   })
   
   observeEvent(input$increment_buyBoost, {
-    cost <- y() * y() * 5  # Cost formula: boost^2 * 5
+    cost <- y() * y() * 3  # Cost formula: boost^2 * 5
     if (x() >= cost) {     # Check if cookies are sufficient
       x(x() - cost)        # Deduct cookies for the cost
       y(y() + 1)           # Increment boost level
@@ -123,7 +123,7 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$increment_buyUsine, {
-    cost <- round(u() * u()/1.25 * 100 + 750)  # Cost formula: boost^2 * 5
+    cost <- round(u() * u()/1.5 * 100 + 750)  # Cost formula: boost^2 * 5
     if (x() >= cost && u() < 100) {     # Check if cookies are sufficient
       x(x() - cost)        # Deduct cookies for the cost
       u(u() + 1)           # Increment auto level
@@ -133,7 +133,7 @@ server <- function(input, output, session) {
   autoIncrement <- function() {
     isolate({#pour modifier les valeur reactives hors d'un observe
       if (a() > 0) {
-          x(round(x()+(a() - ((a() / 115)))))
+          x(round(x()+(a() - ((a() / 125)))))
       }
     later::later(autoIncrement, 1 - (a()/115))  # Schedule next call in 1 second
     })
@@ -142,7 +142,7 @@ server <- function(input, output, session) {
   autoIncrement2 <- function() {
     isolate({#pour modifier les valeur reactives hors d'un observe
       if (m() > 0) {
-        x(round(x()+(m() * 25 - ((m() / 115) * 25))))
+        x(round(x()+(m() * 25 - ((m() / 125) * 25))))
       }
       later::later(autoIncrement2, 1 - (m()/115))  # Schedule next call in 1 second
     })
@@ -151,15 +151,16 @@ server <- function(input, output, session) {
   autoIncrement3 <- function() {
     isolate({#pour modifier les valeur reactives hors d'un observe
       if (u() > 0) {
-        x(round(x()+(u() * 50 - ((u() / 115) * 50))))
+        x(round(x()+(u() * 50 - ((u() / 125) * 50))))
       }
-      later::later(autoIncrement2, 1 - (m()/115))  # Schedule next call in 1 second
+      later::later(autoIncrement3, 1 - (m()/115))  # Schedule next call in 1 second
     })
   }
   
   # Start auto-increment logic
   autoIncrement()
   autoIncrement2()
+  autoIncrement3()
   
   
   output$x_value <- renderText({
