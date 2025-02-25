@@ -1,22 +1,24 @@
 #include <iostream>
 #include <math.h>
+#include <Rcpp.h> // To interface with our R program;
+
 
 class TakuzuRules
 {
 
-
 public:
 
-    //size of the grid
+    //size of the grid 2D of the Taluzu.
     #define SIZE 6
     int grid[SIZE][SIZE];
 
     // rules
+    // Checks whether a line respects the rule of the same number of one and zero :
     bool isValidLine(int line){
         int count0 = 0;
         int count1 = 0;
         for(int i = 0; i < SIZE; i++){
-            if(grid[line][i] == 0){
+            if(grid[line][i] == 0){ 
                 count0++;
             }else if(grid[line][i] == 1){
                 count1++;
