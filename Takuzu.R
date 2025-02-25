@@ -1,33 +1,35 @@
-#' @title Application Shiny Takuzu
 #' @description An application Shiny for play at Takuzu with differently option of the difficulties 
 #' @author Mickael Coquerelle & Loik Galtier
 #' @import shiny # Add library
+  
+#' @import shiny DT
 #' @export
 
 library(shiny)
+library(DT)
+library(Rcpp)  # Interface avec C++ via Rcpp
 
-#Fonction checkboxGroupINPUT( pour les checkbox)
+# Chargez le code C++ 
+sourceCpp("TakuzuRules.cpp")
+
 ######################################################################################################
 #                                   Interface Layout
 ######################################################################################################
 
-#' @title Interface uuser (UI)
-#' @description Défine the interface user of the shiny application
-#' @return An UI object for apply Shiny
 ui <- fluidPage(
   titlePanel("Welcome to LM~Takuzu"),
   
-  # Style CSS personalised
+  # Style CSS personnalisé
   tags$style(HTML("
     body {
-      background-image: url('home/mickael/Belette.jpg'); /* Ou une image */
+      background-image: url('home/mickael/Belette.jpg');
       background-size: cover;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      margin: 0;}
-      
+      margin: 0;
+    }
     .btn-custom {
       width: 150px;
       height: 50px;
@@ -36,15 +38,15 @@ ui <- fluidPage(
       cursor: pointer;
       margin: 10px;
       box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.3);
-      transition: all 0.2s ease-in-out;}
-    
+      transition: all 0.2s ease-in-out;
+    }
     .btn-custom:hover {
       transform: translateY(-5px);
-      box-shadow: 3px 3px 20px rgba(0, 0, 0, 0.5);}
-    
-  ")),  
+      box-shadow: 3px 3px 20px rgba(0, 0, 0, 0.5);
+    }
+  ")),
   
-  # Main page
+  # Layout principal
   sidebarLayout(
     sidebarPanel(
       # Sélecteur pour la taille de la matrice
@@ -52,7 +54,7 @@ ui <- fluidPage(
                   choices = c("6 X 6", "8 X 8", "Custom"),
                   selected = "6 X 6"),
       
-      # select level difficulty
+      # Sélecteur pour le niveau de difficulté
       selectInput("Difficulty", "Niveau de difficulté", 
                   choices = c("Facile", "Moyen", "Difficile", "Impossible"),
                   selected = "Facile"),
@@ -64,7 +66,7 @@ ui <- fluidPage(
     ),
     
     mainPanel(
-      # Display agrid according to selection
+      # Affiche la grille générée
       uiOutput("grille_matrice")
     )
   )
@@ -74,31 +76,33 @@ ui <- fluidPage(
 #                                   Server Logic
 ######################################################################################################
 
-#' @title Application server.
-#' @description Défine server logic  and display game matrix.
-#' @param input List of user inputs.
-#' @param output List of dynamically displayed items.
-#' @return An object server for shiny.
-server <- function(input, output) {
+server <- function(input, output, session) {
   
-  #' @title Generate the takuzu grid
-  #' @description Generates an interactive grid of buttons based on the size selected by the user.
-  #' @return  UI dynamic  display of grid matrix 6x6, 8x8 or custom
+  #' @title Génération de la grille Takuzu
+  #' @description Génère dynamiquement une grille de jeu en appelant la fonction Rcpp exportée
   output$grille_matrice <- renderUI({
-    # Déterminer la taille de la grille selon la sélection
-    # Define grid size according to selection
+    # Déterminez la taille de la grille selon la sélection de l'utilisateur
     size <- switch(input$Matrice_size,
                    "6 X 6" = 6,
                    "8 X 8" = 8,
-                   "Custom" = 10)  # Example of size personalised
+                   "Custom" = 10)
     
-    # Create a button grid matrix
-    grid <- lapply(1:size^2, function(i) {
-      actionButton(paste("cell", i, sep = "_"), label = "", class = "btn-custom")
+    # Appel à la fonction C++ pour générer la grille valide
+    grid_matrix <- generateValidBoard()  # Retourne une NumericMatrix
+    
+    # Création d'un layout de boutons (un pour chaque cellule de la grille)
+    rows <- lapply(1:size, function(i) {
+      row_buttons <- lapply(1:size, function(j) {
+        # On peut afficher la valeur générée dans la grille
+        actionButton(
+          inputId = paste0("cell_", i, "_", j),
+          label = as.character(grid_matrix[i, j]),
+          class = "btn-custom"
+        )
+      })
+      fluidRow(row_buttons)
     })
-    
-    # Organizing buttons in a matrix
-    div(class = "matrice", grid)
+    do.call(tagList, rows)
   })
 }
 
@@ -106,6 +110,4 @@ server <- function(input, output) {
 #                                    Run the application
 ######################################################################################################
 
-#' @title Application launch
-#' @description Starts the shiny application with the previously defined user interface and server.
 shinyApp(ui = ui, server = server)
