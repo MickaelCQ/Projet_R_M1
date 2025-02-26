@@ -158,19 +158,20 @@ NumericMatrix generateValidBoard(){
     return grid;
 }
 
+NumericMatrix partialBoard()
+{
+    for(int i = 0; i < SIZE; i++){
+        for(int j = 0; j < SIZE; j++){
+            if(rand() % 3 == 0){ //change value for more difficulty
+               grid(i, j) = grid(i, j);
+            } else {
+                grid(i, j) = -1;
+            }
+        }
+    }
+    return grid;
+}
 
-//void showBoard(){
-  //  for(int i = 0; i < SIZE; i++){
-    //    for(int j = 0; j < SIZE; j++){
-      //      if(rand() % 3 == 0){ //change value for more difficulty
-        //        std::cout << grid(i, j) << " ";
-          //  } else {
-            //    std::cout << "X ";
-            //}
-        //}
-        //std::cout << std::endl;
-    //}
-//}
 
 //int main(){
   //  srand(time(NULL));    //initialize random seed
