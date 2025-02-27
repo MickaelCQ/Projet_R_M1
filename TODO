@@ -1,3 +1,3 @@
-- not generate the grid, but generate some value and see possible grid. If one min valid, lets roll.
+- Better clear grid for seing only one possible, and change the help from the start to depend of the quantity of case reveal
 - check out time to change it, optimize, try different seed, and in the baddest case, break.
-- create help function, who reveal a random case, not revealed yet, but beware that not only one grid is possible
+- create change function,who verif that the case is player input (not comput input) 

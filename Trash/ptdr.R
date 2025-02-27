@@ -1,8 +1,8 @@
 library(shiny)
 
 # Define grid dimensions
-num_rows <- 4
-num_cols <- 5
+num_rows <- 10
+num_cols <- 10
 num_buttons <- num_rows * num_cols
 
 ui <- fluidPage(
@@ -12,7 +12,7 @@ ui <- fluidPage(
         display: grid;
         grid-template-columns: repeat(%d, 1fr);
         grid-template-rows: repeat(%d, 60px);
-        gap: 10px;
+        gap: 0px;
         justify-content: center;
         max-width: %dpx;
         margin: auto;
@@ -21,7 +21,7 @@ ui <- fluidPage(
         position: relative;
       }
       .grid-button {
-        width: 100px;
+        width: 50px;
         height: 50px;
       }
       .msg {
@@ -35,7 +35,7 @@ ui <- fluidPage(
         font-size: 12px;
         white-space: nowrap;
       }
-    ", num_cols, num_rows, num_cols * 110)))  
+    ", num_cols, num_rows - 10, num_cols * 10)))  
   ),
   
   titlePanel("Button Grid with Temporary Messages"),
@@ -44,7 +44,7 @@ ui <- fluidPage(
       lapply(1:num_buttons, function(i) {
         div(class = "grid-button-container",
             actionButton(inputId = paste0("btn", i), 
-                         label = paste("Button", i), 
+                         label = paste("0"), 
                          class = "grid-button"),
             uiOutput(paste0("msg", i)) # Space for temporary message
         )
@@ -63,7 +63,7 @@ server <- function(input, output, session) {
       isolate({
         later::later(function() {
           messages[[paste0("msg", i)]] <- NULL
-        }, delay = 2)
+        }, delay = 1)
       })
     })
     
