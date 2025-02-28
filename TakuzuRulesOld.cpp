@@ -2,7 +2,7 @@
 #include <math.h>
 
 //size of the TrueGrid
-#define SIZE 6 //need always pair
+#define SIZE 20 //need always pair
 int TrueGrid[SIZE][SIZE];
 int ActualGrid[SIZE][SIZE];
 
@@ -47,6 +47,19 @@ bool isValidBoard( int Grid[SIZE][SIZE]){
     return true;
 }
 
+bool isValiCase( int Grid[SIZE][SIZE]){
+    for(int i = 0; i < SIZE; i++){
+        for(int j = 0; j < SIZE; j++){
+            if(i > 1 && Grid[i][j] == Grid[i-1][j] && Grid[i][j] == Grid[i-2][j] && Grid[i][j] != -1){
+                return false;
+            }
+            if(j > 1 && Grid[i][j] == Grid[i][j-1] && Grid[i][j] == Grid[i][j-2] && Grid[i][j] != -1){
+                return false;
+            }
+        }
+    }
+    return true;
+}
 //need to check that never two columns are the same
 bool isValid(int Grid[SIZE][SIZE]){
     for(int i = 0; i < SIZE; i++){
@@ -94,6 +107,15 @@ void generateValidBoard(){
             for(int j = 0; j < SIZE; j++){
                 if(count0 < SIZE / 2 && count1 < SIZE / 2){
                     TrueGrid[i][j] = rand() % 2;
+                    if (i > 1 && TrueGrid[i][j] == TrueGrid[i-1][j] && TrueGrid[i][j] == TrueGrid[i-2][j] && TrueGrid[i][j] != -1)
+                    {
+                        TrueGrid[i][j] = 1 - TrueGrid[i][j];
+                    }
+                    if (j > 1 && TrueGrid[i][j] == TrueGrid[i][j-1] && TrueGrid[i][j] == TrueGrid[i][j-2] && TrueGrid[i][j] != -1)
+                    {
+                        TrueGrid[i][j] = 1 - TrueGrid[i][j];
+                    }
+                    
                 } else if(count0 < SIZE / 2){
                     TrueGrid[i][j] = 0;
                 } else {
@@ -134,11 +156,21 @@ void removeValue(int i, int j){
     int count = 0;
     for(int k = 0; k < 2; k++){
         TrueGrid[i][j] = k;
-        if(isValidBoard(TrueGrid)){
+        if(isValid(TrueGrid)){
             count++;
         }
+
+        if (ActualGrid[i-1][j] == 7 && ActualGrid[i-2][j] == 7)
+        {
+            count++;
+        }
+
+        if (ActualGrid[i][j-1] == 7 && ActualGrid[i][j-2] == 7)
+        {
+            count++;
+        }
+        
     }
-    std::cout << count << std::endl;
     TrueGrid[i][j] = tmp; // restore the original value
     if(count == 1){
         ActualGrid[i][j] = 7;
@@ -178,7 +210,8 @@ void changeValue(int iteration){
 
 
 int main(){
-    //srand(1);    //initialize notrandom seed
+    //srand(1740728974);    //initialize notrandom seed
+    std::cout << "seed : " << time(NULL) << std::endl;
     srand(time(NULL));    //initialize random seed
     generateValidBoard();   //generate the valid TrueGrid
     //printBoard(TrueGrid);
@@ -188,10 +221,16 @@ int main(){
             removeValue(i, j);
         }
     }
+
+
     printBoard(ActualGrid);
-    for (int i = 0; i < SIZE * 3; i++){ // Here change for the difficulty and the size of board // ex EZ : Size * 3, ex Hard : Size * 1
+    
+
+    for (int i = 0; i < SIZE * 1; i++){ // Here change for the difficulty and the size of board // ex EZ : Size * 3, ex Hard : Size * 1
         changeValue(0); // also be used for help when player blocked
     }
+
+
     printBoard(ActualGrid);
     return 0;
 }
