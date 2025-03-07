@@ -12,13 +12,14 @@ using namespace Rcpp;
 NumericMatrix grid(SIZE, SIZE); // Utilisable directement dans R
 // https://cran.r-project.org/web/packages/Rcpp/vignettes/Rcpp-quickref.pdf
 // [[Rcpp::export]]
-NumericMatrix change_val(NumericMatrix mtx,int i, int j){
-   if (i >= 0 && i < mtx.nrow() && 
-       j >= 0 && j < mtx.ncol()){ // Vérifie que i et j tombent bien dans la matrice
-       mtx(i,j) = (mtx(i,j) == 1) ? 0 : 1;  // Change la valuer par O si un sinon 1, (opérateur ternaire d'Alban)       
+void change_val(int i, int j){
+   if (i >= 0 && i < grid.nrow() && 
+       j >= 0 && j < grid.ncol()){ // Vérifie que i et j tombent bien dans la matrice
+       grid(i,j) = (grid(i,j) == 1) ? 0 : 1;  // Change la valuer par O si 1 sinon 1, (opérateur ternaire d'Alban)       
 }
-return mtx;
 }
+
+
 
 // Vérifier qu'on a bien nos comptes de zéros et uns égaux dans chaque ligne. (lignes équilibrées) 
 bool isValidLine(int line, NumericMatrix &grid){
