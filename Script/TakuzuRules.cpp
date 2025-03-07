@@ -17,6 +17,7 @@ NumericMatrix change_val(NumericMatrix mtx,int i, int j){
        j >= 0 && j < mtx.ncol()){ // Vérifie que i et j tombent bien dans la matrice
        mtx(i,j) = (mtx(i,j) == 1) ? 0 : 1;  // Change la valuer par O si un sinon 1, (opérateur ternaire d'Alban)       
 }
+return mtx;
 }
 
 // Vérifier qu'on a bien nos comptes de zéros et uns égaux dans chaque ligne. (lignes équilibrées) 
@@ -28,7 +29,7 @@ bool isValidLine(int line, NumericMatrix &grid){
             count0++;
         }else if(grid(line,i) == 1){  // [] > ()
             count1++;
-        }
+        } 
     }
     return count0 == count1;
 }
@@ -62,6 +63,7 @@ bool isValidBoard(NumericMatrix &grid){
     }// end first loop
     return true;
 }
+
 
 //need to check that never two columns are the same
 
@@ -182,6 +184,10 @@ NumericMatrix generatePartialBoard(NumericMatrix full_grid)
     return partial_grid;
 }
 
+// [[Rcpp::export]]
+NumericMatrix getActualGrid() {
+  return grid;
+}
 
 //int main(){
   //  srand(time(NULL));    //initialize random seed
