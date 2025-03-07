@@ -11,9 +11,13 @@ using namespace Rcpp;
 
 NumericMatrix grid(SIZE, SIZE); // Utilisable directement dans R
 // https://cran.r-project.org/web/packages/Rcpp/vignettes/Rcpp-quickref.pdf
-
-// rules
-
+// [[Rcpp::export]]
+NumericMatrix change_val(NumericMatrix mtx,int i, int j){
+   if (i >= 0 && i < mtx.nrow() && 
+       j >= 0 && j < mtx.ncol()){ // Vérifie que i et j tombent bien dans la matrice
+       mtx(i,j) = (mtx(i,j) == 1) ? 0 : 1;  // Change la valuer par O si un sinon 1, (opérateur ternaire d'Alban)       
+}
+}
 
 // Vérifier qu'on a bien nos comptes de zéros et uns égaux dans chaque ligne. (lignes équilibrées) 
 bool isValidLine(int line, NumericMatrix &grid){
@@ -158,18 +162,24 @@ NumericMatrix generateValidBoard(){
     return grid;
 }
 
-NumericMatrix partialBoard()
-{
+// generatePartialBoard ; 
+// Génère une grille partiellement visible où environ 33% des cases conservent leur valeur originale de `full_grid` 
+// (avec une chance de 1 sur 3), et les autres sont masquées avec la valeur -1.  Ce pourcentage de visibilité pourrait être ajusté pour changer notre difficulté de jeu (par exemple, 25% ou 50%).
+
+NumericMatrix generatePartialBoard(NumericMatrix full_grid)
+{ NumericMatrix partial_grid = clone(full_grid); //copie de la grille
     for(int i = 0; i < SIZE; i++){
         for(int j = 0; j < SIZE; j++){
-            if(rand() % 3 == 0){ //change value for more difficulty
-               grid(i, j) = grid(i, j);
-            } else {
-                grid(i, j) = -1;
-            }
+            partial_grid(i,j) = (rand() % 3 == 0) ? full_grid(i,j) : -1; // version ternaire
+            
+            //if(rand() % 3 == 0){ //change value for more difficulty
+            //   grid(i, j) = grid(i, j);
+            //} else {
+              //  grid(i, j) = -1;
+            //}
         }
     }
-    return grid;
+    return partial_grid;
 }
 
 
