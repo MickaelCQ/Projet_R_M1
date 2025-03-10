@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include <math.h>
 
 #include <Rcpp.h> // To interface with our R program;
@@ -145,8 +146,10 @@ bool isValid(NumericMatrix &grid){
 // Génère une grille valide
 // [[Rcpp::export]]
 NumericMatrix generateValidBoard(){
+    int tenta_max = 1000000; // On limite les tentatives à 10000
+    int tenta = 0;
     // Regénère la grille tant qu'elle n'est pas valide
-    while(!isValid(grid)){
+    while(!isValid(grid) && tenta < tenta_max){
         for(int i = 0; i < SIZE; i++){
             int count0 = 0, count1 = 0;
             for(int j = 0; j < SIZE; j++){
@@ -161,9 +164,18 @@ NumericMatrix generateValidBoard(){
                 else count1++;
             }
         }
+        tenta++;
+
+    }
+    if (tenta == tenta_max) {
+        Rcout << "Échec de génération de la grille après " << tenta_max << " tentatives." << std::endl;
+    }
+    else {
+        Rcout << "Grille conforme générée avec succès après" << tenta << "tentatives." << std::endl;
     }
     return grid;
 }
+
 
 // generatePartialBoard ; 
 // Génère une grille partiellement visible où environ 33% des cases conservent leur valeur originale de `full_grid` 
