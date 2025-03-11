@@ -6,20 +6,19 @@
 using namespace Rcpp;
  
 //size of the grid
-#define SIZE 8 //need always pair
+#define SIZE 10 //need always pair
 
 //int grid[SIZE][SIZE];
 
 NumericMatrix grid(SIZE, SIZE); // Utilisable directement dans R
 // https://cran.r-project.org/web/packages/Rcpp/vignettes/Rcpp-quickref.pdf
 // [[Rcpp::export]]
-void change_val(int i, int j){
-   if (i >= 0 && i < grid.nrow() && 
-       j >= 0 && j < grid.ncol()){ // Vérifie que i et j tombent bien dans la matrice
-       grid(i,j) = (grid(i,j) == 1) ? 0 : 1;  // Change la valuer par O si 1 sinon 1, (opérateur ternaire d'Alban)       
+NumericMatrix change_val(int i, int j) {
+    if (i >= 0 && i < SIZE && j >= 0 && j < SIZE) {
+        grid(i, j) = (grid(i, j) == 1) ? 0 : 1;
+    }
+    return clone(grid); 
 }
-}
-
 
 
 // Vérifier qu'on a bien nos comptes de zéros et uns égaux dans chaque ligne. (lignes équilibrées) 
@@ -51,27 +50,18 @@ bool isValidCol(int col, NumericMatrix &grid){
 }
 
 // Aucune colonne / ligne ne doit contenir trois éléments consécutifs identiques. 
-bool isValidBoard(NumericMatrix &grid){
-    for(int i = 0; i < SIZE; i++){
-        for(int j = 0; j < SIZE; j++){
-            if(i > 1 && grid(i, j) == grid(i-1,j) && grid(i, j) == grid(i-2,j) && grid(i, j) != -1){ // [] > ()
-            // le -1 peut merder avec les numericMatrix si ca plante faut qu'on mette : !NumericMatrix::is_na(grid(i, j))
-                return false;
-            } // end first if 
-            if(j > 1 && grid(i, j) == grid(i,j-1) && grid(i, j) == grid(i,j-2) && grid(i, j) != -1){ // [] > ()
-                return false;
-            } // end second if 
-        }// end second  loop
-    }// end first loop
+bool isValidBoard(const NumericMatrix &grid) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (i > 1 && grid(i, j) == grid(i-1, j) && grid(i, j) == grid(i-2, j)) return false;
+            if (j > 1 && grid(i, j) == grid(i, j-1) && grid(i, j) == grid(i, j-2)) return false;
+        }
+    }
     return true;
 }
 
-
 //need to check that never two columns are the same
-
-// Vérifie qu'aucune paire de colonnes ou de lignes identiques n'existe :
-
-bool isValid(NumericMatrix &grid){
+bool isValid(const NumericMatrix &grid){
     // Vérification que deux colonnes ne sont pas identiques
     for(int i = 0; i < SIZE; i++){
         for(int j = i + 1; j < SIZE; j++){
@@ -107,40 +97,7 @@ bool isValid(NumericMatrix &grid){
     return isValidBoard(grid);
 } //end rules
 
-//generate valid grid
-/*void generateValidBoard(){
-    while(!isValid())
-    {
-        for(int i = 0; i < SIZE; i++){
-            int count0 = 0;
-            int count1 = 0;
-            for(int j = 0; j < SIZE; j++){
-                if(count0 < SIZE / 2 && count1 < SIZE / 2){
-                    grid(i, j) = rand() % 2;
-                } else if(count0 < SIZE / 2){
-                    grid(i, j) = 0;
-                } else {
-                    grid(i, j) = 1;
-                }
-                if(grid(i, j) == 0){
-                    count0++;
-                } else {
-                    count1++;
-                }
-            }
-        }
-    } 
 
-    std::cout << "Board generated" << std::endl;
-    for(int i = 0; i < SIZE; i++){
-        for(int j = 0; j < SIZE; j++){
-            std::cout << grid(i, j) << " ";
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-    std::cout << "Board is valid: " << isValid() << std::endl;
-} */
 
 //-----------------------------------------------------
 // Génère une grille valide
@@ -173,9 +130,8 @@ NumericMatrix generateValidBoard(){
     else {
         Rcout << "Grille conforme générée avec succès après" << tenta << "tentatives." << std::endl;
     }
-    return grid;
+    return clone(grid);
 }
-
 
 // generatePartialBoard ; 
 // Génère une grille partiellement visible où environ 33% des cases conservent leur valeur originale de `full_grid` 
