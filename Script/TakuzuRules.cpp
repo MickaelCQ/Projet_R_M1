@@ -1,167 +1,245 @@
 #include <iostream>
-
 #include <math.h>
 
-#include <Rcpp.h> // To interface with our R program;
-using namespace Rcpp;
- 
-//size of the grid
-#define SIZE 10 //need always pair
+//size of the TrueGrid
+#define SIZE 16 //need always pair
+int TrueGrid[SIZE][SIZE];
+int ActualGrid[SIZE][SIZE];
+int HiddenGrid[SIZE][SIZE];
 
-//int grid[SIZE][SIZE];
-
-NumericMatrix grid(SIZE, SIZE); // Utilisable directement dans R
-// https://cran.r-project.org/web/packages/Rcpp/vignettes/Rcpp-quickref.pdf
-// [[Rcpp::export]]
-NumericMatrix change_val(int i, int j) {
-    if (i >= 0 && i < SIZE && j >= 0 && j < SIZE) {
-        grid(i, j) = (grid(i, j) == 1) ? 0 : 1;
-    }
-    return clone(grid); 
-}
-
-
-// Vérifier qu'on a bien nos comptes de zéros et uns égaux dans chaque ligne. (lignes équilibrées) 
-bool isValidLine(int line, NumericMatrix &grid){
+// rules
+bool isValidLine(int line, int Grid[SIZE][SIZE]){
     int count0 = 0;
     int count1 = 0;
     for(int i = 0; i < SIZE; i++){
-        if(grid(line,i) == 0){  // [] > ()
+        if(Grid[line][i] == 0){
             count0++;
-        }else if(grid(line,i) == 1){  // [] > ()
-            count1++;
-        } 
-    }
-    return count0 == count1;
-}
-
-// Vérifier qu'on a bien nos comptes de zéros et uns égaux dans chaque ligne. (colonnes équilibrées) 
-bool isValidCol(int col, NumericMatrix &grid){
-    int count0 = 0;
-    int count1 = 0;
-    for(int i = 0; i < SIZE; i++){
-        if(grid(i,col) == 0){  // [] > ()
-            count0++;
-        }else if(grid(i,col) == 1){  // [] > ()
+        }else if(Grid[line][i] == 1){
             count1++;
         }
     }
     return count0 == count1;
 }
 
-// Aucune colonne / ligne ne doit contenir trois éléments consécutifs identiques. 
-bool isValidBoard(const NumericMatrix &grid) {
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            if (i > 1 && grid(i, j) == grid(i-1, j) && grid(i, j) == grid(i-2, j)) return false;
-            if (j > 1 && grid(i, j) == grid(i, j-1) && grid(i, j) == grid(i, j-2)) return false;
+bool isValidCol(int col,  int Grid[SIZE][SIZE]){
+    int count0 = 0;
+    int count1 = 0;
+    for(int i = 0; i < SIZE; i++){
+        if(Grid[i][col] == 0){
+            count0++;
+        }else if(Grid[i][col] == 1){
+            count1++;
+        }
+    }
+    return count0 == count1;
+}
+
+bool isValidBoard( int Grid[SIZE][SIZE]){
+    for(int i = 0; i < SIZE; i++){
+        for(int j = 0; j < SIZE; j++){
+            if(i > 1 && Grid[i][j] == Grid[i-1][j] && Grid[i][j] == Grid[i-2][j] && Grid[i][j] != -1){
+                return false;
+            }
+            if(j > 1 && Grid[i][j] == Grid[i][j-1] && Grid[i][j] == Grid[i][j-2] && Grid[i][j] != -1){
+                return false;
+            }
         }
     }
     return true;
 }
 
-//need to check that never two columns are the same
-bool isValid(const NumericMatrix &grid){
-    // Vérification que deux colonnes ne sont pas identiques
-    for(int i = 0; i < SIZE; i++){
-        for(int j = i + 1; j < SIZE; j++){
-            bool same = true;
-            for(int k = 0; k < SIZE; k++){
-                if(grid(k, i) != grid(k, j)){ // [] > ()
-                    same = false;
-                    break;
-                }
-            }
-            if(same){
-                return false;
-            }
-        }
-    }
-    
-    // Vérification que deux lignes ne sont pas identiques
-    for(int i = 0; i < SIZE; i++){
-        for(int j = i + 1; j < SIZE; j++){
-            bool same = true;
-            for(int k = 0; k < SIZE; k++){
-                if(grid(i, k) != grid(j, k)){ // [] > ()
-                    same = false;
-                    break;
-                }
-            }
-            if(same){
-                return false;
-            }
-        }
-    }
-    // Si aucune duplication de lignes/ colonnes  n'est détectée, on vérifie d'autres règles de validité
-    return isValidBoard(grid);
-} //end rules
-
-
-
-//-----------------------------------------------------
-// Génère une grille valide
-// [[Rcpp::export]]
-NumericMatrix generateValidBoard(){
-    int tenta_max = 1000000; // On limite les tentatives à 10000
-    int tenta = 0;
-    // Regénère la grille tant qu'elle n'est pas valide
-    while(!isValid(grid) && tenta < tenta_max){
-        for(int i = 0; i < SIZE; i++){
-            int count0 = 0, count1 = 0;
-            for(int j = 0; j < SIZE; j++){
-                if(count0 < SIZE / 2 && count1 < SIZE / 2)
-                    grid(i, j) = rand() % 2;
-                else if(count0 < SIZE / 2)
-                    grid(i, j) = 0;
-                else
-                    grid(i, j) = 1;
-                
-                if(grid(i, j) == 0) count0++;
-                else count1++;
-            }
-        }
-        tenta++;
-
-    }
-    if (tenta == tenta_max) {
-        Rcout << "Échec de génération de la grille après " << tenta_max << " tentatives." << std::endl;
-    }
-    else {
-        Rcout << "Grille conforme générée avec succès après" << tenta << "tentatives." << std::endl;
-    }
-    return clone(grid);
-}
-
-// generatePartialBoard ; 
-// Génère une grille partiellement visible où environ 33% des cases conservent leur valeur originale de `full_grid` 
-// (avec une chance de 1 sur 3), et les autres sont masquées avec la valeur -1.  Ce pourcentage de visibilité pourrait être ajusté pour changer notre difficulté de jeu (par exemple, 25% ou 50%).
-
-NumericMatrix generatePartialBoard(NumericMatrix full_grid)
-{ NumericMatrix partial_grid = clone(full_grid); //copie de la grille
+bool isValiCase( int Grid[SIZE][SIZE]){
     for(int i = 0; i < SIZE; i++){
         for(int j = 0; j < SIZE; j++){
-            partial_grid(i,j) = (rand() % 3 == 0) ? full_grid(i,j) : -1; // version ternaire
-            
-            //if(rand() % 3 == 0){ //change value for more difficulty
-            //   grid(i, j) = grid(i, j);
-            //} else {
-              //  grid(i, j) = -1;
-            //}
+            if(i > 1 && Grid[i][j] == Grid[i-1][j] && Grid[i][j] == Grid[i-2][j] && Grid[i][j] != -1){
+                return false;
+            }
+            if(j > 1 && Grid[i][j] == Grid[i][j-1] && Grid[i][j] == Grid[i][j-2] && Grid[i][j] != -1){
+                return false;
+            }
         }
     }
-    return partial_grid;
+    return true;
+}
+//need to check that never two columns are the same
+bool isValid(int Grid[SIZE][SIZE]){
+    for(int i = 0; i < SIZE; i++){
+        for(int j = i + 1; j < SIZE; j++){
+            bool same = true;
+            for(int k = 0; k < SIZE; k++){
+                if(Grid[k][i] != Grid[k][j]){
+                    same = false;
+                    break;
+                }
+            }
+            if(same){
+                return false;
+            }
+        }
+    }
+
+    for(int i = 0; i < SIZE; i++){
+        for(int j = i + 1; j < SIZE; j++){
+            bool same = true;
+            for(int k = 0; k < SIZE; k++){
+                if(Grid[i][k] != Grid[j][k]){
+                    same = false;
+                    break;
+                }
+            }
+            if(same){
+                return false;
+            }
+        }
+    }
+    return isValidBoard(Grid);
+}
+//end rules
+
+
+
+//generate valid TrueGrid
+void generateValidBoard(){
+    while(!isValid(TrueGrid) || !isValidLine(0, TrueGrid) || !isValidCol(0, TrueGrid))
+    {
+        for(int i = 0; i < SIZE; i++){
+            int count0 = 0;
+            int count1 = 0;
+            for(int j = 0; j < SIZE; j++){
+                if(count0 < SIZE / 2 && count1 < SIZE / 2){
+                    TrueGrid[i][j] = rand() % 2;
+                    if (i > 1 && TrueGrid[i][j] == TrueGrid[i-1][j] && TrueGrid[i][j] == TrueGrid[i-2][j] && TrueGrid[i][j] != -1)
+                    {
+                        TrueGrid[i][j] = 1 - TrueGrid[i][j];
+                    }
+                    if (j > 1 && TrueGrid[i][j] == TrueGrid[i][j-1] && TrueGrid[i][j] == TrueGrid[i][j-2] && TrueGrid[i][j] != -1)
+                    {
+                        TrueGrid[i][j] = 1 - TrueGrid[i][j];
+                    }
+                    
+                } else if(count0 < SIZE / 2){
+                    TrueGrid[i][j] = 0;
+                } else {
+                    TrueGrid[i][j] = 1;
+                }
+                if(TrueGrid[i][j] == 0){
+                    count0++;
+                } else {
+                    count1++;
+                }
+            }
+        }
+    } 
+
+    std::cout << "Board generated" << std::endl;
+    for(int i = 0; i < SIZE; i++){
+        for(int j = 0; j < SIZE; j++){
+            std::cout << TrueGrid[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
 }
 
-// [[Rcpp::export]]
-NumericMatrix getActualGrid() {
-  return grid;
+
+// clone the board
+void cloneBoard(int TrueGrid[SIZE][SIZE], int ActualGrid[SIZE][SIZE]){
+    for(int i = 0; i < SIZE; i++){
+        for(int j = 0; j < SIZE; j++){
+            ActualGrid[i][j] = TrueGrid[i][j];
+        }
+    }
 }
 
-//int main(){
-  //  srand(time(NULL));    //initialize random seed
-  //  generateValidBoard();   //generate the valid grid
-  //  showBoard();            //show the grid with hidden value
-  //  return 0;
-//}
+// remove value (to a 7) if the value here cannot be change (only one possibility of completiun) (but not working because next ca be also change so need to check taht latter)
+void removeValue(int Grid[SIZE][SIZE], int i, int j){
+    int tmp = TrueGrid[i][j];
+    int count = 0;
+    for(int k = 0; k < 2; k++){
+        TrueGrid[i][j] = k;
+        if(isValid(TrueGrid)){
+            count++;
+        }
 
+        if (Grid[i-1][j] == 7 && Grid[i-2][j] == 7)
+        {
+            count++;
+        }
+
+        if (Grid[i][j-1] == 7 && Grid[i][j-2] == 7)
+        {
+            count++;
+        }
+        
+    }
+    TrueGrid[i][j] = tmp; // restore the original value
+    if(count == 1){
+        Grid[i][j] = 7;
+    }
+}
+
+// print board enter in parameter of the void
+void printBoard(int Grid[SIZE][SIZE]){
+    for(int i = 0; i < SIZE; i++){
+        for(int j = 0; j < SIZE; j++){
+            if(Grid[i][j] == 1)
+            {
+                std::cout << "X ";
+            }
+            else if(Grid[i][j] == 0)
+            {
+                std::cout << "O ";
+            }
+            else
+            {
+
+                std::cout << "  ";
+            }
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+}
+
+void changeValue(int Grid[SIZE][SIZE],int iteration){
+    if (iteration > SIZE * SIZE * SIZE * SIZE)
+    {
+        std::cout << "you don't have luck bro" << std::endl;
+        return;
+    }
+
+    int i = rand() % SIZE;
+    int j = rand() % SIZE;
+    if(Grid[i][j] != 0 && Grid[i][j] != 1){
+        Grid[i][j] = TrueGrid[i][j];
+        return;
+    }
+    else
+    {
+        changeValue(Grid, iteration + 1);
+    }
+}
+
+
+
+int main(){
+    //srand(1740728974);    //initialize notrandom seed
+    std::cout << "seed : " << time(NULL) << std::endl;
+    srand(time(NULL));    //initialize random seed
+    generateValidBoard();   //generate the valid TrueGrid
+    //printBoard(TrueGrid);
+    cloneBoard(TrueGrid, HiddenGrid);
+    for (int i = 0; i < SIZE; i++){
+        for (int j = 0; j < SIZE; j++){
+            removeValue(HiddenGrid, i, j);
+        }
+    }
+    for (int i = 0; i < SIZE * 0; i++){ // Here change for the difficulty and the size of board // ex EZ : Size * 3, ex Hard : Size * 1
+        changeValue(HiddenGrid, 0); // also be used for help when player blocked
+    }
+
+
+    cloneBoard(HiddenGrid, ActualGrid);
+    printBoard(ActualGrid);
+    return 0;
+}
