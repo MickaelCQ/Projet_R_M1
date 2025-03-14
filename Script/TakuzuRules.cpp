@@ -6,6 +6,9 @@ using namespace Rcpp;
 
 //size of the TrueGrid
 #define SIZE 12 //need always pair
+
+NumericMatrix grid(SIZE, SIZE);
+
 NumericMatrix TrueGrid(SIZE, SIZE);
 NumericMatrix ActualGrid(SIZE, SIZE);
 NumericMatrix HiddenGrid(SIZE, SIZE);
@@ -103,8 +106,9 @@ bool isValid(NumericMatrix &Grid){
 //end rules
 
 
-
-//generate valid TrueGrid
+//-----------------------------------------------------
+// Génère une grille valide
+// [[Rcpp::export]]
 NumericMatrix generateValidBoard(){
     while(!isValid(TrueGrid) || !isValidLine(0, TrueGrid) || !isValidCol(0, TrueGrid))
     {
@@ -228,7 +232,7 @@ void changeValue(NumericMatrix &Grid,int iteration){
     }
 }
 
-NumericMatrix change_val(int i, int j) {
+NumericMatrix change_val(NumericMatrix &grid, int i, int j) {
     if (i >= 0 && i < SIZE && j >= 0 && j < SIZE) {
         grid(i, j) = (grid(i, j) == 1) ? 0 : 1;
     }
