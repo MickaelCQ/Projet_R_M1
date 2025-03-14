@@ -1,3 +1,8 @@
-- Better clear grid for seing only one possible, and change the help from the start to depend of the quantity of case reveal
-- check out time to change it, optimize, try different seed, and in the baddest case, break.
 - create change function,who verif that the case is player input (not comput input) 
+
+
+Mickael :
+
+- Bascule en rcpp et connect. 
+- Methode pour au moment de la génération d'une valeur, on vérifie que les regles restent justes.
+- 

@@ -1,0 +1,10 @@
+ifelse(condition, valeur_si_vrai, valeur_si_faux)
+
+observevent :fonction de Shiny qui permet de surveiller un événement spécifique (comme un clic sur un bouton) et d'exécuter une action en réponse à cet événement. Elle permet de rendre l'application interactive en déclenchant du code lorsqu'on interagit avec l'interface. type:
+observeEvent(input$myButton, {
+  # Ce code sera exécuté lorsque l'utilisateur cliquera sur le bouton 'myButton'
+  print("Le bouton a été cliqué!")
+})
+
+
+
