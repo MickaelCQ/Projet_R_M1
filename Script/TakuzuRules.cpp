@@ -10,6 +10,7 @@ NumericMatrix TrueGrid(SIZE, SIZE);
 NumericMatrix ActualGrid(SIZE, SIZE);
 NumericMatrix HiddenGrid(SIZE, SIZE);
 
+
 // rules
 bool isValidLine(int line, NumericMatrix &Grid){
     int count0 = 0;
@@ -227,4 +228,10 @@ void changeValue(NumericMatrix &Grid,int iteration){
     }
 }
 
+NumericMatrix change_val(int i, int j) {
+    if (i >= 0 && i < SIZE && j >= 0 && j < SIZE) {
+        grid(i, j) = (grid(i, j) == 1) ? 0 : 1;
+    }
+    return clone(grid); 
+}
 
