@@ -145,7 +145,7 @@ NumericMatrix generateValidBoard(){
     }
     std::cout << std::endl;
 
-    return clone(TrueGrid);
+    return TrueGrid;
 }
 
 
@@ -228,25 +228,3 @@ void changeValue(NumericMatrix &Grid,int iteration){
 }
 
 
-
-int main(){
-    //srand(1740728974);    //initialize notrandom seed
-    std::cout << "seed : " << time(NULL) << std::endl;
-    srand(time(NULL));    //initialize random seed
-    generateValidBoard();   //generate the valid TrueGrid
-    //printBoard(TrueGrid);
-    cloneBoard(TrueGrid, HiddenGrid);
-    for (int i = 0; i < SIZE; i++){
-        for (int j = 0; j < SIZE; j++){
-            removeValue(HiddenGrid, i, j);
-        }
-    }
-    for (int i = 0; i < SIZE * 0; i++){ // Here change for the difficulty and the size of board // ex EZ : Size * 3, ex Hard : Size * 1
-        changeValue(HiddenGrid, 0); // also be used for help when player blocked
-    }
-
-
-    cloneBoard(HiddenGrid, ActualGrid);
-    printBoard(ActualGrid);
-    return 0;
-}
