@@ -4,15 +4,23 @@
 #include <Rcpp.h> // To interface with our R program;
 using namespace Rcpp;
 
-//size of the TrueGrid
+//size of the grid
 #define SIZE 12 //need always pair
 
 NumericMatrix grid(SIZE, SIZE);
-
-NumericMatrix TrueGrid(SIZE, SIZE);
 NumericMatrix ActualGrid(SIZE, SIZE);
 NumericMatrix HiddenGrid(SIZE, SIZE);
 
+
+// https://cran.r-project.org/web/packages/Rcpp/vignettes/Rcpp-quickref.pdf
+// [[Rcpp::export]]
+NumericMatrix change_val(int i, int j) 
+{
+    if (i >= 0 && i < SIZE && j >= 0 && j < SIZE) {
+        ActualGrid(i, j) = (ActualGrid(i, j) == 1) ? 0 : 1;
+    }
+    return clone(ActualGrid); 
+}
 
 // rules
 bool isValidLine(int line, NumericMatrix &Grid){
@@ -110,29 +118,29 @@ bool isValid(NumericMatrix &Grid){
 // Génère une grille valide
 // [[Rcpp::export]]
 NumericMatrix generateValidBoard(){
-    while(!isValid(TrueGrid) || !isValidLine(0, TrueGrid) || !isValidCol(0, TrueGrid))
+    while(!isValid(grid) || !isValidLine(0, grid) || !isValidCol(0, grid))
     {
         for(int i = 0; i < SIZE; i++){
             int count0 = 0;
             int count1 = 0;
             for(int j = 0; j < SIZE; j++){
                 if(count0 < SIZE / 2 && count1 < SIZE / 2){
-                    TrueGrid(i,j) = rand() % 2;
-                    if (i > 1 && TrueGrid(i,j) == TrueGrid(i-1,j) && TrueGrid(i,j) == TrueGrid(i-2,j) && TrueGrid(i,j) != -1)
+                    grid(i,j) = rand() % 2;
+                    if (i > 1 && grid(i,j) == grid(i-1,j) && grid(i,j) == grid(i-2,j) && grid(i,j) != -1)
                     {
-                        TrueGrid(i,j) = 1 - TrueGrid(i,j);
+                        grid(i,j) = 1 - grid(i,j);
                     }
-                    if (j > 1 && TrueGrid(i,j) == TrueGrid(i,j-1) && TrueGrid(i,j) == TrueGrid(i,j-2) && TrueGrid(i,j) != -1)
+                    if (j > 1 && grid(i,j) == grid(i,j-1) && grid(i,j) == grid(i,j-2) && grid(i,j) != -1)
                     {
-                        TrueGrid(i,j) = 1 - TrueGrid(i,j);
+                        grid(i,j) = 1 - grid(i,j);
                     }
                     
                 } else if(count0 < SIZE / 2){
-                    TrueGrid(i,j) = 0;
+                    grid(i,j) = 0;
                 } else {
-                    TrueGrid(i,j) = 1;
+                    grid(i,j) = 1;
                 }
-                if(TrueGrid(i,j) == 0){
+                if(grid(i,j) == 0){
                     count0++;
                 } else {
                     count1++;
@@ -144,13 +152,13 @@ NumericMatrix generateValidBoard(){
     std::cout << "Board generated" << std::endl;
     for(int i = 0; i < SIZE; i++){
         for(int j = 0; j < SIZE; j++){
-            std::cout << TrueGrid(i,j) << " ";
+            std::cout << grid(i,j) << " ";
         }
         std::cout << std::endl;
     }
     std::cout << std::endl;
 
-    return TrueGrid;
+    return grid;
 }
 
 
@@ -163,31 +171,47 @@ void cloneBoard(NumericMatrix &PastGrid, NumericMatrix &NewGrid){
     }
 }
 
+
 // remove value (to a 7) if the value here cannot be change (only one possibility of completiun) (but not working because next ca be also change so need to check taht latter)
+// [[Rcpp::export]]
 void removeValue(NumericMatrix &Grid, int i, int j){
-    int tmp = TrueGrid(i,j);
-    int count = 0;
-    for(int k = 0; k < 2; k++){
-        TrueGrid(i,j) = k;
-        if(isValid(TrueGrid)){
-            count++;
-        }
-
-        if (Grid(i-1, j) == 7 && Grid(i-2,j) == 7)
-        {
-            count++;
-        }
-
-        if (Grid(i, j-1) == 7 && Grid(i, j-2) == 7)
-        {
-            count++;
-        }
-        
+  int tmp = grid(i,j);
+  int count = 0;
+  for(int k = 0; k < 2; k++){
+    grid(i,j) = k;
+    if(isValid(grid)){
+      count++;
     }
-    TrueGrid(i,j) = tmp; // restore the original value
-    if(count == 1){
-        Grid(i, j) = 7;
+    
+    if (Grid(i-1, j) == 7 && Grid(i-2,j) == 7)
+    {
+      count++;
     }
+    
+    if (Grid(i, j-1) == 7 && Grid(i, j-2) == 7)
+    {
+      count++;
+    }
+    
+  }
+  grid(i,j) = tmp; // restore the original value
+  if(count == 1){
+    Grid(i, j) = 7;
+  }
+}
+
+
+// [[Rcpp::export]]
+NumericMatrix NewGrid()
+{
+    cloneBoard(grid, ActualGrid);
+    for (int i = 0; i < SIZE; i++){
+        for (int j = 0; j < SIZE; j++){
+            removeValue(ActualGrid, i, j);
+        }
+    }
+    
+    return clone(ActualGrid);
 }
 
 // print board enter in parameter of the void
@@ -223,19 +247,12 @@ void changeValue(NumericMatrix &Grid,int iteration){
     int i = rand() % SIZE;
     int j = rand() % SIZE;
     if(Grid(i, j) != 0 && Grid(i, j) != 1){
-        Grid(i, j) = TrueGrid(i,j);
+        Grid(i, j) = grid(i,j);
         return;
     }
     else
     {
         changeValue(Grid, iteration + 1);
     }
-}
-
-NumericMatrix change_val(NumericMatrix &grid, int i, int j) {
-    if (i >= 0 && i < SIZE && j >= 0 && j < SIZE) {
-        grid(i, j) = (grid(i, j) == 1) ? 0 : 1;
-    }
-    return clone(grid); 
 }
 
