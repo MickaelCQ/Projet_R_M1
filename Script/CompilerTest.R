@@ -16,7 +16,7 @@ library(Rcpp)
 #' 
 #' @param file Le chemin vers le fichier C++ à charger.
 #' @export
-sourceCpp("/home/mickael/Projets_GIT/Projet_R_M1/Script/TakuzuRules.cpp")
+sourceCpp("~/git/Projet_R_M1/Script/TakuzuRules.cpp")
 #sourceCpp("/home/mickael/Projets_GIT/Projet_R_M1/Script/takuzuTestMicka.cpp")
 
 #' Définition de l'interface utilisateur de l'application Shiny
@@ -43,8 +43,8 @@ server <- function(input, output, session) {
   #' Créer une variable réactive pour la grille du jeu
   #'
   # Initialiser la grille avec une configuration valide via une fonction C++.
-  grid <- reactiveVal(generateValidBoard())  # Initialiser avec une grille valide
-  
+  gri <- reactiveVal(generateValidBoard())  # Initialiser avec une grille valide
+  grid <- reactiveVal(NewGrid())
   #' Mise à jour des cellules de la grille en fonction des événements
   #'
   # Cette section écoute les événements de modification des cellules de la grille

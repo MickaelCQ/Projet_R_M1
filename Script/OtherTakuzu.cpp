@@ -246,24 +246,36 @@ int GetCaseValue(int i, int j)
 // [[Rcpp::export]]
 void PlayerChangeValue(int i, int j)
 {
-    if(ActualGrid[i][j] == 0) 
+    if(HiddenGrid[i][j] == 7) // is valeur non fixé
     {
+        if(ActualGrid[i][j] == 0) 
+        {
         ActualGrid[i][j] = 1;
-    }
-    else if(ActualGrid[i][j] == 1)
-    {
-        ActualGrid[i][j] = 7;
-    }
-    else
-    {
-        ActualGrid[i][j] = 0;
-    }
+        }
+        else if(ActualGrid[i][j] == 1)
+        {
+            ActualGrid[i][j] = 7;
+        }
+        else
+        {
+            ActualGrid[i][j] = 0;
+        }
 
-    if(!isValidBoard(ActualGrid))
-    {
-        std::cout << "bro c pas valide" << std::endl;
+        if(!isValidBoard(ActualGrid))
+        {
+            std::cerr << "3 d'affilé !" << std::endl;
+        }
+        else if(!isValidLine(i, ActualGrid) || !isValidCol(j, ActualGrid))
+        {
+            std::cerr << "pas les mêmes quantités de 0 et de 1 !" << std::endl;    
+        }
+        else if(!isValid(ActualGrid))
+        {
+            //not opti becase with check again validBoard
+            std::cerr << "Deux collone ou ligne identique !" << std::endl;    
+        }
+        printBoard(ActualGrid);
     }
-    printBoard(ActualGrid);
 }
 
 int main(){
