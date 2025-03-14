@@ -28,9 +28,9 @@ bool isValidCol(int col, NumericMatrix &Grid){
     int count0 = 0;
     int count1 = 0;
     for(int i = 0; i < SIZE; i++){
-        if(Grid(line, i) == 0){
+        if(Grid(col, i) == 0){
             count0++;
-        }else if(Grid(line, i) == 1){
+        }else if(Grid(col, i) == 1){
             count1++;
         }
     }
@@ -104,7 +104,7 @@ bool isValid(NumericMatrix &Grid){
 
 
 //generate valid TrueGrid
-void generateValidBoard(){
+NumericMatrix generateValidBoard(){
     while(!isValid(TrueGrid) || !isValidLine(0, TrueGrid) || !isValidCol(0, TrueGrid))
     {
         for(int i = 0; i < SIZE; i++){
@@ -144,6 +144,8 @@ void generateValidBoard(){
         std::cout << std::endl;
     }
     std::cout << std::endl;
+
+    return clone(TrueGrid);
 }
 
 
