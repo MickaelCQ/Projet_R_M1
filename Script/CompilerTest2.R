@@ -5,79 +5,118 @@ library(Rcpp)
 sourceCpp("/home/mickael/Projets_GIT/Projet_R_M1/Script/OtherTakuzu.cpp")
 
 ui <- fluidPage(
-  titlePanel("T"),
+  titlePanel("Welcome To Takuzu² LM"),
   
-  # Liste déroulante pour choisir la taille de la grille
+  # Sélection de la taille de la grille
   selectInput("grid_size", "Choisir la taille de la grille:", 
-              choices = c("Facile 6x6" = 6, "Moyen 8x8" = 8, "Expert 10x10 " = 10, "Impossible 14x14" = 14),
+              choices = c("Facile 6x6" = 6, "Moyen 8x8" = 8, "Expert 10x10" = 10, "Impossible 14x14" = 14),
               selected = 8),
   
-  # Espace réservé pour afficher la grille du jeu
-  uiOutput("gameGrid")
+  # Espace pour afficher la grille du jeu
+  uiOutput("gameGrid"),
+  
+  # Bouton "?" pour afficher les règles
+  actionButton("help_btn", "?", style = "
+    font-size: 20px; 
+    height: 50px; 
+    width: 50px; 
+    background-color: lightgray; 
+    color: black; 
+    border: none; 
+    border-radius: 50%; 
+    position: fixed; 
+    top: 10px; 
+    right: 10px; 
+    box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  ")
 )
 
 server <- function(input, output, session) {
-  # Créer une variable réactive pour la taille de la grille
-  reactive_size <- reactive({
-    input$grid_size  # Cette valeur changera lorsque l'utilisateur sélectionne une taille
-  })
+  # Taille de la grille réactive
+  reactive_size <- reactive({ as.numeric(input$grid_size) })
   
   observe({
-    # Initialiser la grille avec la bonne taille en fonction du choix de l'utilisateur
     Size <- reactive_size()
-    mainGenerate()  # Initialiser la grille avec la nouvelle taille
+    mainGenerate()
     
-    observe({
-      # Créer des événements pour chaque cellule de la grille
-      for (i in 1:Size) {
-        for (j in 1:Size) {
-          local({
-            row <- i
-            col <- j
-            button_id <- paste0("cell_", row, "_", col)
-            
-            observeEvent(input[[button_id]], {
-              isolate({
-                # Modifier la valeur de la cellule avec la fonction C++
-                PlayerChangeValue(row - 1, col - 1)
-                new_value <- GetCaseValue(row - 1, col - 1)  # Récupérer la nouvelle valeur après changement
-                
-                # Définir la nouvelle couleur en fonction de la valeur
-                color <- ifelse(new_value == 1, "lightblue", 
-                                ifelse(new_value == 0, "lightgreen", 
-                                       ifelse(new_value == 7, "white", "white")))
-                
-                # Mettre à jour la cellule avec le nouveau label via updateActionButton
-                updateActionButton(session, paste0("cell_", row, "_", col), 
-                                   label = as.character(new_value))
-              })
-            }, ignoreNULL = TRUE, ignoreInit = TRUE)
-          })
-        }
+    # Ajout d'un observeEvent pour chaque cellule
+    for (i in 1:Size) {
+      for (j in 1:Size) {
+        local({
+          row <- i
+          col <- j
+          button_id <- paste0("cell_", row, "_", col)
+          
+          observeEvent(input[[button_id]], {
+            isolate({
+              PlayerChangeValue(row - 1, col - 1)
+              new_value <- GetCaseValue(row - 1, col - 1)
+              
+              updateActionButton(session, button_id, label = as.character(new_value))
+              
+              # Changer la couleur avec JavaScript
+              session$sendCustomMessage("changeColor", list(id = button_id, value = new_value))
+            })
+          }, ignoreNULL = TRUE, ignoreInit = TRUE)
+        })
       }
-    })
+    }
   })
   
-  # Rendu de l'interface de la grille de jeu
+  # Mise à jour de la grille
   output$gameGrid <- renderUI({
-    Size <- reactive_size()  # Récupérer la taille actuelle de la grille
+    Size <- reactive_size()
     tagList(
+      tags$script(HTML("
+        Shiny.addCustomMessageHandler('changeColor', function(message) {
+          var button = document.getElementById(message.id);
+          if (button) {
+            if (message.value == 1) {
+              button.style.backgroundColor = 'lightblue';
+              button.style.color = 'black';
+            } else if (message.value == 0) {
+              button.style.backgroundColor = 'lightgreen';
+              button.style.color = 'black';
+            } else if (message.value == 7) {
+              button.style.color = 'white';
+            } else {
+              button.style.backgroundColor = 'white';
+              button.style.color = 'black';
+            }
+          }
+        });
+      ")),
       lapply(1:Size, function(i) {
         fluidRow(
           lapply(1:Size, function(j) {
-            value <- GetCaseValue(i-1, j-1)  # Valeur de la cellule
-            color <- ifelse(value == 1, "lightblue", 
-                            ifelse(value == 0, "lightgreen", 
-                                   ifelse(value == 7, "white", "white")))  # Couleur par défaut
+            value <- GetCaseValue(i-1, j-1)
+            button_id <- paste0("cell_", i, "_", j)
+            text_color <- ifelse(value == x, "white", "black")
+            
             actionButton(
-              inputId = paste0("cell_", i, "_", j),  # Identifiant unique
-              label = as.character(value),  # Afficher la valeur de la cellule
-              style = paste0("background-color:", color, "; color: black; width: 50px; height: 50px; font-size: 20px;")
+              inputId = button_id,
+              label = as.character(value),
+              style = paste0("color: ", text_color, "; width: 50px; height: 50px; font-size: 20px; box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);")
             )
           })
         )
       })
     )
+  })
+  
+  observeEvent(input$help_btn, {
+    showModal(modalDialog(
+      title = "Bienvenue sur le Jeu Takuzu de Loik et Mickael",
+      "Quelques éléments de compréhension pour vous aider :\n\n",
+      "- Remplissez la grille avec des zéros et des uns en respectant ces règles :\n\n",
+      "- Chaque ligne et colonne doit contenir un nombre égal de 0 et de 1.\n\n",
+      "- Aucune ligne ou colonne ne peut être identique à une autre.\n\n",
+      "- Chaque case peut être modifiée en cliquant dessus.\n\n",
+      "- Vous gagnez lorsque toutes les règles sont respectées ! Bonne chance !",
+      easyClose = TRUE,
+      footer = modalButton("Fermer")
+    ))
   })
 }
 
