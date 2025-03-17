@@ -2,7 +2,7 @@ library(shiny)
 library(Rcpp)
 
 # Charger le fichier C++ avec les fonctions nécessaires
-sourceCpp("~/git/Projet_R_M1/Script/OtherTakuzu.cpp")
+sourceCpp("~/git/Projet_R_M1/Script/TakuzuRulesV2.cpp")
 
 ui <- fluidPage(
   titlePanel("Welcome To Takuzu² LM"),
@@ -34,10 +34,10 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   # Taille de la grille réactive
-  reactive_size <- reactive({ as.numeric(input$grid_size) })
+  reactive_size <- reactive({A = as.numeric(input$grid_size)})
   
   observe({
-    Size <- reactive_size()
+    #ici set la taille     SetSize(int)
     mainGenerate()
     
     # Ajout d'un observeEvent pour chaque cellule
