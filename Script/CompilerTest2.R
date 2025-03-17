@@ -2,7 +2,7 @@ library(shiny)
 library(Rcpp)
 
 # Charger le fichier C++ avec les fonctions nécessaires
-sourceCpp("/home/mickael/Projets_GIT/Projet_R_M1/Script/OtherTakuzu.cpp")
+sourceCpp("~/git/Projet_R_M1/Script/OtherTakuzu.cpp")
 
 ui <- fluidPage(
   titlePanel("Welcome To Takuzu² LM"),
@@ -79,6 +79,7 @@ server <- function(input, output, session) {
               button.style.backgroundColor = 'lightgreen';
               button.style.color = 'black';
             } else if (message.value == 7) {
+              button.style.backgroundColor = 'white';
               button.style.color = 'white';
             } else {
               button.style.backgroundColor = 'white';
@@ -92,7 +93,7 @@ server <- function(input, output, session) {
           lapply(1:Size, function(j) {
             value <- GetCaseValue(i-1, j-1)
             button_id <- paste0("cell_", i, "_", j)
-            text_color <- ifelse(value == x, "white", "black")
+            text_color <- ifelse(value == 7, "white", "black")
             
             actionButton(
               inputId = button_id,

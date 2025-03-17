@@ -6,10 +6,13 @@
 using namespace Rcpp;
 
 //size of the TrueGrid
-#define SIZE 8 //need always pair
+#define SIZE 6 //need always pair
 int TrueGrid[SIZE][SIZE];
 int ActualGrid[SIZE][SIZE];
 int HiddenGrid[SIZE][SIZE];
+
+
+
 // rules
 bool isValidLine(int line, int Grid[SIZE][SIZE]){
     int count0 = 0;
@@ -142,6 +145,17 @@ void generateValidBoard(){
 }
 
 
+void clearGrid()
+{
+    for (int i = 0; i < SIZE; ++i) 
+    {
+        for (int j = 0; j < SIZE; ++j) 
+        {
+            TrueGrid[i][j] = -1;    
+        }
+    }    
+}
+
 // clone the board
 void cloneBoard(int TrueGrid[SIZE][SIZE], int ActualGrid[SIZE][SIZE]){
     for(int i = 0; i < SIZE; i++){
@@ -214,9 +228,10 @@ void changeValue(int grid[SIZE][SIZE], int iteration){
 // [[Rcpp::export]]
 void mainGenerate()
 {    
-    srand(1740728974);    //initialize notrandom seed
+    clearGrid();
+    //srand(1740728974);    //initialize notrandom seed
     //std::cout << "seed : " << time(NULL) << std::endl;
-    //srand(time(NULL));    //initialize random seed
+    srand(time(NULL));    //initialize random seed
     generateValidBoard();   //generate the valid TrueGrid
     //printBoard(TrueGrid);
     cloneBoard(TrueGrid, HiddenGrid);
@@ -277,6 +292,8 @@ void PlayerChangeValue(int i, int j)
         printBoard(ActualGrid);
     }
 }
+
+
 
 int main(){
     return 0;
