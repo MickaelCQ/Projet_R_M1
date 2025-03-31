@@ -51,10 +51,12 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   # Taille de la grille réactive
-  SetSize(10)
   reactive_size <- reactive({A = as.numeric(input$grid_size)})
+
   
-  observe({
+  observe({    
+    fixed_size <- reactive_size()
+    SetSize(fixed_size)
     Size <- GetSize()
     mainGenerate()
     
