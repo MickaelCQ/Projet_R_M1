@@ -220,6 +220,11 @@ void SetSize(int size)
 {
     SIZE = size;
 }
+// [[Rcpp::export]]
+int GetSize()
+{
+    return SIZE;
+}
 
 // print board enter in parameter of the void
 void printBoard(vector<vector<int>> Grid){

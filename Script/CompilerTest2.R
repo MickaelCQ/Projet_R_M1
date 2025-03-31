@@ -1,9 +1,24 @@
+#' Application Shiny pour le jeu Takuzu avec Rcpp
+#'
+#' Cette application Shiny permet de jouer au jeu Takuzu. Elle utilise des fonctions C++ via Rcpp pour gérer la logique du jeu.
+#' L'interface permet à l'utilisateur de cliquer sur des cellules de la grille et de modifier leur valeur.
+#'
+#' @import shiny
+#' @import Rcpp
+#' @export
+#'
 library(shiny)
 library(Rcpp)
 
-# Charger le fichier C++ avec les fonctions nécessaires
-#sourceCpp("~/git/Projet_R_M1/Script/TakuzuRulesV2.cpp")
-sourceCpp("/home/mickael/Projets_GIT/Projet_R_M1/Script/TakuzuRulesV3.cpp")
+
+#' Charger le fichier C++ avec les fonctions nécessaires
+#'
+#' Charge le fichier C++ contenant les règles du jeu Takuzu.
+#' 
+#' @param file Le chemin vers le fichier C++ à charger.
+#' @export
+#sourceCpp("/home/mickael/Projets_GIT/Projet_R_M1/Script/TakuzuRules.cpp")
+sourceCpp("~/Documents/git/Projet_R_M1/Script/OtherTakuzu.cpp")
 
 ui <- fluidPage(
   titlePanel("Welcome To Takuzu² LM"),
@@ -12,6 +27,7 @@ ui <- fluidPage(
   selectInput("grid_size", "Choisir la taille de la grille:", 
               choices = c("Facile 6x6" = 6, "Moyen 8x8" = 8, "Expert 10x10" = 10, "Impossible 14x14" = 14),
               selected = 8),
+
   
   # Espace pour afficher la grille du jeu
   uiOutput("gameGrid"),
@@ -35,10 +51,11 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   # Taille de la grille réactive
+  SetSize(10)
   reactive_size <- reactive({A = as.numeric(input$grid_size)})
   
   observe({
-    #ici set la taille     SetSize(int)
+    Size <- GetSize()
     mainGenerate()
     
     # Ajout d'un observeEvent pour chaque cellule
@@ -50,7 +67,6 @@ server <- function(input, output, session) {
           button_id <- paste0("cell_", row, "_", col)
           
           observeEvent(input[[button_id]], {
-            isolate({
               PlayerChangeValue(row - 1, col - 1)
               new_value <- GetCaseValue(row - 1, col - 1)
               
@@ -58,8 +74,7 @@ server <- function(input, output, session) {
               
               # Changer la couleur avec JavaScript
               session$sendCustomMessage("changeColor", list(id = button_id, value = new_value))
-            })
-          }, ignoreNULL = TRUE, ignoreInit = TRUE)
+          })
         })
       }
     }
@@ -67,7 +82,7 @@ server <- function(input, output, session) {
   
   # Mise à jour de la grille
   output$gameGrid <- renderUI({
-    Size <- reactive_size()
+    Size <- GetSize()
     tagList(
       tags$script(HTML("
         Shiny.addCustomMessageHandler('changeColor', function(message) {
@@ -93,11 +108,10 @@ server <- function(input, output, session) {
         fluidRow(
           lapply(1:Size, function(j) {
             value <- GetCaseValue(i-1, j-1)
-            button_id <- paste0("cell_", i, "_", j)
             text_color <- ifelse(value == 7, "white", "black")
             
             actionButton(
-              inputId = button_id,
+              inputId = paste0("cell_", i, "_",j ),
               label = as.character(value),
               style = paste0("color: ", text_color, "; width: 50px; height: 50px; font-size: 20px; box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);")
             )
