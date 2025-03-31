@@ -2,7 +2,8 @@ library(shiny)
 library(Rcpp)
 
 # Charger le fichier C++ avec les fonctions nécessaires
-sourceCpp("~/git/Projet_R_M1/Script/TakuzuRulesV2.cpp")
+#sourceCpp("~/git/Projet_R_M1/Script/TakuzuRulesV2.cpp")
+sourceCpp("/home/mickael/Projets_GIT/Projet_R_M1/Script/TakuzuRulesV3.cpp")
 
 ui <- fluidPage(
   titlePanel("Welcome To Takuzu² LM"),
