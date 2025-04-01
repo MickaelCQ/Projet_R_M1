@@ -57,7 +57,7 @@ server <- function(input, output, session) {
   observe({    
     fixed_size <- reactive_size()
     SetSize(fixed_size)
-    Size <- GetSize()
+    Size <- fixed_size
     mainGenerate()
     
     # Ajout d'un observeEvent pour chaque cellule
