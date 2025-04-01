@@ -17,8 +17,8 @@ library(Rcpp)
 #' 
 #' @param file Le chemin vers le fichier C++ à charger.
 #' @export
-#sourceCpp("/home/mickael/Projets_GIT/Projet_R_M1/Script/TakuzuRules.cpp")
-sourceCpp("~/Documents/git/Projet_R_M1/Script/OtherTakuzu.cpp")
+sourceCpp("/home/mickael/Projets_GIT/Projet_R_M1/Script/OtherTakuzu.cpp")
+#sourceCpp("~/Documents/git/Projet_R_M1/Script/OtherTakuzu.cpp")
 
 ui <- fluidPage(
   titlePanel("Welcome To Takuzu² LM"),
@@ -27,7 +27,6 @@ ui <- fluidPage(
   selectInput("grid_size", "Choisir la taille de la grille:", 
               choices = c("Facile 6x6" = 6, "Moyen 8x8" = 8, "Expert 10x10" = 10, "Impossible 14x14" = 14),
               selected = 8),
-
   
   # Espace pour afficher la grille du jeu
   uiOutput("gameGrid"),
@@ -50,41 +49,43 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
-  # Taille de la grille réactive
-  reactive_size <- reactive({A = as.numeric(input$grid_size)})
-
   
-  observe({    
+  # Taille de la grille réactive
+  reactive_size <- reactive({ as.numeric(input$grid_size) })
+  
+  # Mise à jour de la grille lors du changement de taille
+  observe({
     fixed_size <- reactive_size()
-    SetSize(fixed_size)
-    Size <- fixed_size
-    mainGenerate()
+    SetSize(fixed_size)  # Mise à jour de la taille dans le C++ (via SetSize)
+    mainGenerate()       # Génération de la grille après changement de taille
     
-    # Ajout d'un observeEvent pour chaque cellule
-    for (i in 1:Size) {
-      for (j in 1:Size) {
+    # Ajout d'un observeEvent pour chaque cellule (dynamiquement)
+    for (i in 1:fixed_size) {
+      for (j in 1:fixed_size) {
         local({
           row <- i
           col <- j
           button_id <- paste0("cell_", row, "_", col)
           
+          # Observer chaque cellule pour un changement de valeur lorsqu'on clique
           observeEvent(input[[button_id]], {
-              PlayerChangeValue(row - 1, col - 1)
-              new_value <- GetCaseValue(row - 1, col - 1)
-              
-              updateActionButton(session, button_id, label = as.character(new_value))
-              
-              # Changer la couleur avec JavaScript
-              session$sendCustomMessage("changeColor", list(id = button_id, value = new_value))
+            PlayerChangeValue(row - 1, col - 1)  # Modification de la valeur dans C++
+            new_value <- GetCaseValue(row - 1, col - 1)  # Récupération de la nouvelle valeur
+            
+            # Mise à jour du bouton (affichage de la nouvelle valeur)
+            updateActionButton(session, button_id, label = as.character(new_value))
+            
+            # Changer la couleur avec JavaScript via un message personnalisé
+            session$sendCustomMessage("changeColor", list(id = button_id, value = new_value))
           })
         })
       }
     }
   })
   
-  # Mise à jour de la grille
+  # Mise à jour de la grille affichée
   output$gameGrid <- renderUI({
-    Size <- GetSize()
+    fixed_size <- reactive_size()  # Récupération de la taille actuelle de la grille
     tagList(
       tags$script(HTML("
         Shiny.addCustomMessageHandler('changeColor', function(message) {
@@ -106,15 +107,16 @@ server <- function(input, output, session) {
           }
         });
       ")),
-      lapply(1:Size, function(i) {
+      # Création dynamique de la grille en fonction de la taille
+      lapply(1:fixed_size, function(i) {
         fluidRow(
-          lapply(1:Size, function(j) {
-            value <- GetCaseValue(i-1, j-1)
-            text_color <- ifelse(value == 7, "white", "black")
+          lapply(1:fixed_size, function(j) {
+            value <- GetCaseValue(i - 1, j - 1)  # Valeur actuelle de la cellule
+            text_color <- ifelse(value == 7, "white", "black")  # Choix de la couleur du texte
             
             actionButton(
-              inputId = paste0("cell_", i, "_",j ),
-              label = as.character(value),
+              inputId = paste0("cell_", i, "_", j),  # ID unique pour chaque cellule
+              label = as.character(value),  # Affichage de la valeur
               style = paste0("color: ", text_color, "; width: 50px; height: 50px; font-size: 20px; box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);")
             )
           })
@@ -123,6 +125,7 @@ server <- function(input, output, session) {
     )
   })
   
+  # Affichage des règles du jeu
   observeEvent(input$help_btn, {
     showModal(modalDialog(
       title = "Bienvenue sur le Jeu Takuzu de Loik et Mickael",
