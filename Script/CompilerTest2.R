@@ -17,8 +17,8 @@ library(Rcpp)
 #' 
 #' @param file Le chemin vers le fichier C++ à charger.
 #' @export
-sourceCpp("/home/mickael/Projets_GIT/Projet_R_M1/Script/OtherTakuzu.cpp")
-#sourceCpp("~/Documents/git/Projet_R_M1/Script/OtherTakuzu.cpp")
+#sourceCpp("/home/x/Projets_GIT/Projet_R_M1/Script/OtherTakuzu.cpp")
+sourceCpp("/media/GALTIER/NEW VOLUME/OtherTakuzu.cpp")
 
 ui <- fluidPage(
   titlePanel("Welcome To Takuzu² LM"),
@@ -55,6 +55,7 @@ server <- function(input, output, session) {
   
   # Mise à jour de la grille lors du changement de taille
   observe({
+    cat("Resize")
     fixed_size <- reactive_size()
     SetSize(fixed_size)  # Mise à jour de la taille dans le C++ (via SetSize)
     mainGenerate()       # Génération de la grille après changement de taille
@@ -69,6 +70,7 @@ server <- function(input, output, session) {
           
           # Observer chaque cellule pour un changement de valeur lorsqu'on clique
           observeEvent(input[[button_id]], {
+            cat("n")
             PlayerChangeValue(row - 1, col - 1)  # Modification de la valeur dans C++
             new_value <- GetCaseValue(row - 1, col - 1)  # Récupération de la nouvelle valeur
             
@@ -128,7 +130,7 @@ server <- function(input, output, session) {
   # Affichage des règles du jeu
   observeEvent(input$help_btn, {
     showModal(modalDialog(
-      title = "Bienvenue sur le Jeu Takuzu de Loik et Mickael",
+      title = "Bienvenue sur le Jeu Takuzu de x et y",
       "Quelques éléments de compréhension pour vous aider :\n\n",
       "- Remplissez la grille avec des zéros et des uns en respectant ces règles :\n\n",
       "- Chaque ligne et colonne doit contenir un nombre égal de 0 et de 1.\n\n",

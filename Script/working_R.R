@@ -17,7 +17,7 @@ library(Rcpp)
 #' @param file Le chemin vers le fichier C++ à charger.
 #' @export
 #sourceCpp("/home/mickael/Projets_GIT/Projet_R_M1/Script/TakuzuRules.cpp")
-sourceCpp("/home/mickael/Projets_GIT/Projet_R_M1/Script/working_cpp.cpp")
+sourceCpp("~/Documents/git/Projet_R_M1/Script/working_cpp.cpp")
 
 #' Définition de l'interface utilisateur de l'application Shiny
 #'

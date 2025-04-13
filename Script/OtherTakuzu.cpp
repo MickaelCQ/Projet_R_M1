@@ -12,9 +12,8 @@ vector<vector<int>> TrueGrid;
 vector<vector<int>> ActualGrid;
 vector<vector<int>> HiddenGrid;
 
-
 // rules
-bool isValidLine(int line, vector<vector<int>> Grid){
+bool isValidLine(int line, vector<vector<int>>& Grid){
     int count0 = 0;
     int count1 = 0;
     for(int i = 0; i < SIZE; i++)
@@ -32,7 +31,7 @@ bool isValidLine(int line, vector<vector<int>> Grid){
     return count0 == count1;
 }
 
-bool isValidCol(int col, vector<vector<int>> Grid){
+bool isValidCol(int col, vector<vector<int>>& Grid){
     int count0 = 0;
     int count1 = 0;
     for(int i = 0; i < SIZE; i++){
@@ -50,7 +49,7 @@ bool isValidCol(int col, vector<vector<int>> Grid){
     return count0 == count1;
 }
 
-bool isValidBoard(vector<vector<int>> Grid)
+bool isValidBoard(const vector<vector<int>>& Grid)
 {
     for(int i = 0; i < SIZE; i++){
         for(int j = 0; j < SIZE; j++){
@@ -65,41 +64,66 @@ bool isValidBoard(vector<vector<int>> Grid)
     return true;
 }
 
-//need to check that never two columns are the same
-bool isValid(vector<vector<int>> Grid){
-    for(int i = 0; i < SIZE; i++){
-        for(int j = i + 1; j < SIZE; j++){
-            bool same = true;
-            for(int k = 0; k < SIZE; k++){
-                if(Grid[k][i] == 7 || Grid[k][i] != Grid[k][j]){
-                    same = false;
-                    break;
-                }
-            }
-            if(same){
-                return false;
-            }
-        }
-    }
 
-    for(int i = 0; i < SIZE; i++){
-        for(int j = i + 1; j < SIZE; j++){
-            bool same = true;
-            for(int k = 0; k < SIZE; k++){
-                if(Grid[k][i] == 7 || Grid[i][k] != Grid[j][k]){
-                    same = false;
-                    break;
-                }
-            }
-            if(same){
-                return false;
-            }
+bool isValid(const vector<vector<int>>& Grid) {
+  for(int i = 0; i < SIZE; i++){
+    for(int j = i + 1; j < SIZE; j++){
+      bool same = true;
+      for(int k = 0; k < SIZE; k++){
+        if(Grid[k][i] == 7 || Grid[k][i] != Grid[k][j]){
+          same = false;
+          break;
         }
+      }
+      if(same){
+        return false;
+      }
     }
-    return isValidBoard(Grid);
+  }
+  
+  for(int i = 0; i < SIZE; i++){
+    for(int j = i + 1; j < SIZE; j++){
+      bool same = true;
+      for(int k = 0; k < SIZE; k++){
+        if(Grid[k][i] == 7 || Grid[i][k] != Grid[j][k]){
+          same = false;
+          break;
+        }
+      }
+      if(same){
+        return false;
+      }
+    }
+  }
+  return isValidBoard(Grid);
 }
 //end rules
 
+
+void clearGrid()
+{ 
+  //dependant de size
+  //creer les trois grilles et vide chaque case
+  
+  TrueGrid.clear();
+  ActualGrid.clear();
+  HiddenGrid.clear();
+  
+  
+  TrueGrid.resize(SIZE);
+  ActualGrid.resize(SIZE);
+  HiddenGrid.resize(SIZE);
+  for(int i = 0; i < SIZE; i++){
+    TrueGrid[i].resize(SIZE);
+    ActualGrid[i].resize(SIZE);
+    HiddenGrid[i].resize(SIZE);
+    for (int j = 0; j < SIZE; j++)
+    {
+      TrueGrid[i][j] = 6;
+    }
+    
+  }
+}
 
 
 //generate valid TrueGrid
@@ -135,14 +159,6 @@ void generateValidBoard(){
         }
     } 
 
-    std::cout << "Board generated" << std::endl;
-    for(int i = 0; i < SIZE; i++){
-        for(int j = 0; j < SIZE; j++){
-            std::cout << TrueGrid[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
 }
 
 // clone the board
@@ -163,63 +179,26 @@ void cloneActualBoard(vector<vector<int>> OldGrid){
 }
 // remove value (to a 7) if the value here cannot be change (only one possibility of completiun) (but not working because next ca be also change so need to check taht latter)
 void removeValue(int i, int j){
-    int tmp = TrueGrid[i][j];
-    int count = 0;
-    for(int k = 0; k < 2; k++){
-        TrueGrid[i][j] = k;
-        if(isValid(TrueGrid)){
-            count++;
-        }
 
-        if (HiddenGrid[i-1][j] == 7 && HiddenGrid[i-2][j] == 7 && HiddenGrid[i][j-3] == 7)
-        {
-            count++;
-        }
-
-
-
-        if (HiddenGrid[i][j-1] == 7 && HiddenGrid[i][j-2] == 7 && HiddenGrid[i][j-3] == 7)
-        {
-            count++;
-        }
-
+    if (HiddenGrid[i][j] != 7) {
+        int tmp = TrueGrid[i][j];
+        TrueGrid[i][j] = 0;
+        bool valid0 = isValid(TrueGrid);
+        TrueGrid[i][j] = 1;
+        bool valid1 = isValid(TrueGrid);
+        TrueGrid[i][j] = tmp;
+        if (valid0 != valid1) HiddenGrid[i][j] = 7;
     }
-    TrueGrid[i][j] = tmp; // restore the original value
-    if(count == 1){
-        HiddenGrid[i][j] = 7;
-    }
+
 }
 
-void clearGrid()
-{
-    //dependant de size
-    //creer les trois grilles et vide chaque case
-
-    TrueGrid.clear();
-    ActualGrid.clear();
-    HiddenGrid.clear();
-
-
-    TrueGrid.resize(SIZE);
-    ActualGrid.resize(SIZE);
-    HiddenGrid.resize(SIZE);
-    for(int i = 0; i < SIZE; i++){
-        TrueGrid[i].resize(SIZE);
-        ActualGrid[i].resize(SIZE);
-        HiddenGrid[i].resize(SIZE);
-        for (int j = 0; j < SIZE; j++)
-        {
-            TrueGrid[i][j] = 6;
-        }
-        
-    }
-}
 
 // [[Rcpp::export]]
 void SetSize(int size)
 {
     SIZE = size;
 }
+
 // [[Rcpp::export]]
 int GetSize()
 {
@@ -227,7 +206,7 @@ int GetSize()
 }
 
 // print board enter in parameter of the void
-void printBoard(vector<vector<int>> Grid){
+void printBoard(vector<vector<int>>& Grid){
     for(int i = 0; i < SIZE; i++){
         for(int j = 0; j < SIZE; j++){
             std::cout << Grid[i][j] << " ";
@@ -237,7 +216,7 @@ void printBoard(vector<vector<int>> Grid){
     std::cout << std::endl;
 }
 
-void changeValue(vector<vector<int>> grid, int iteration){
+void changeValue(vector<vector<int>>& grid, int iteration){
     if (iteration > SIZE * SIZE * SIZE)
     {
         std::cout << "you don't have luck bro" << std::endl;
@@ -248,6 +227,7 @@ void changeValue(vector<vector<int>> grid, int iteration){
     int j = rand() % SIZE;
     if(grid[i][j] != 0 && grid[i][j] != 1){
         grid[i][j] = TrueGrid[i][j];
+      std::cout << "changed by : " << TrueGrid[i][j] << endl;
         return;
     }
     else
@@ -266,19 +246,21 @@ void mainGenerate()
     srand(time(NULL));    //initialize random seed
     generateValidBoard();   //generate the valid TrueGrid
     cloneToHiddenBoard(TrueGrid);
-    printBoard(HiddenGrid);
+    //printBoard(HiddenGrid);
     for (int i = 0; i < SIZE; i++){
         for (int j = 0; j < SIZE; j++){
             removeValue(i, j);
         }
     }
 
-    for (int i = 0; i < SIZE * 0; i++){ // Here change for the difficulty and the size of board // ex EZ : Size * 3, ex Hard : Size * 1
+    for (int i = 0; i < SIZE * 1; i++){ // Here change for the difficulty and the size of board // ex EZ : Size * 3, ex Hard : Size * 1
         changeValue(HiddenGrid, 0); // also be used for help when player blocked
     }
+    
+    printBoard(HiddenGrid);
 
     cloneActualBoard(HiddenGrid);
-    printBoard(ActualGrid);
+    //printBoard(ActualGrid);
 
 }
 
