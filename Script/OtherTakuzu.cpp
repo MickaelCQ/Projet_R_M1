@@ -13,40 +13,59 @@ vector<vector<int>> ActualGrid;
 vector<vector<int>> HiddenGrid;
 
 // rules
-bool isValidLine(int line, vector<vector<int>>& Grid){
-    int count0 = 0;
-    int count1 = 0;
-    for(int i = 0; i < SIZE; i++)
-    {
-        if(Grid[line][i] == 7){
-            return true;
-        }
-        if(Grid[line][i] == 0){
-            count0++;
-        }
-        else if(Grid[line][i] == 1){
-            count1++;
-        }
-    }
-    return count0 == count1;
-}
 
-bool isValidCol(int col, vector<vector<int>>& Grid){
+bool isValidNumber(vector<vector<int>>& Grid){
     int count0 = 0;
     int count1 = 0;
     for(int i = 0; i < SIZE; i++){
-        if(Grid[i][col] == 7)
+      for(int j = 0; j < SIZE; j++){
+          if(Grid[i][j] == 7)
+          {
+              return true;
+          }
+          if(Grid[i][j] == 0){
+              count0++;
+          }
+          else if(Grid[i][j] == 1){
+              count1++;
+          }
+      }
+      if(count0 != count1)
         {
-            return true;
+          return false;
         }
-        if(Grid[i][col] == 0){
-            count0++;
-        }
-        else if(Grid[i][col] == 1){
-            count1++;
-        }
+      else
+      {
+        count0 = 0;
+        count1 = 0;
+      }
     }
-    return count0 == count1;
+    
+    for(int i = 0; i < SIZE; i++){
+      for(int j = 0; j < SIZE; j++){
+        if(Grid[j][i] == 7)
+        {
+          return true;
+        }
+        if(Grid[j][i] == 0){
+          count0++;
+        }
+        else if(Grid[j][i] == 1){
+          count1++;
+        }
+      }
+      if(count0 != count1)
+      {
+        return false;
+      }
+      else
+      {
+        count0 = 0;
+        count1 = 0;
+      }
+    }
+    
+    return true;
 }
 
 bool isValidBoard(const vector<vector<int>>& Grid)
@@ -128,7 +147,7 @@ void clearGrid()
 
 //generate valid TrueGrid
 void generateValidBoard(){
-    while(!isValid(TrueGrid) || !isValidLine(0, TrueGrid) || !isValidCol(0, TrueGrid))
+    while(!isValid(TrueGrid) || !isValidNumber(TrueGrid))
     {
         for(int i = 0; i < SIZE; i++){
             int count0 = 0;
@@ -258,7 +277,7 @@ void mainGenerate()
     }
     
     printBoard(HiddenGrid);
-
+    printBoard(TrueGrid);
     cloneActualBoard(HiddenGrid);
     //printBoard(ActualGrid);
 
@@ -292,7 +311,7 @@ void PlayerChangeValue(int i, int j)
         {
             std::cerr << "3 d'affilé !" << std::endl;
         }
-        else if(!isValidLine(i, ActualGrid) || !isValidCol(j, ActualGrid))
+        else if(!isValidNumber(ActualGrid))
         {
             std::cerr << "pas les mêmes quantités de 0 et de 1 !" << std::endl;    
         }
@@ -301,7 +320,6 @@ void PlayerChangeValue(int i, int j)
             //not opti becase with check again validBoard
             std::cerr << "Deux collone ou ligne identique !" << std::endl;    
         }
-        printBoard(ActualGrid);
     }
 }
 

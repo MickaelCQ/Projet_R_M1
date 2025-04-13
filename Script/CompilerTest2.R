@@ -18,7 +18,7 @@ library(Rcpp)
 #' @param file Le chemin vers le fichier C++ à charger.
 #' @export
 #sourceCpp("/home/x/Projets_GIT/Projet_R_M1/Script/OtherTakuzu.cpp")
-sourceCpp("/media/GALTIER/NEW VOLUME/OtherTakuzu.cpp")
+sourceCpp("~/Documents/git/Projet_R_M1/Script/OtherTakuzu.cpp")
 
 ui <- fluidPage(
   titlePanel("Welcome To Takuzu² LM"),
