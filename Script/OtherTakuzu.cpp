@@ -14,6 +14,16 @@ vector<vector<int>> HiddenGrid;
 
 // rules
 
+
+/**
+*@brief Cette fonction à pour objectif de vérifier pour chacune de nos lignes et colonnes que nous avons bien autant de cellules avec 0 qu'avec 1.
+*@param une grille à vérifier : Grid
+*@param 
+*@warning Cette fonction peut entraîner un comportement imprévisible si la taille de la grille est incorrecte ou trop fréquemment générée
+
+*@return True si nos règles de parités sont respectées, le cas échéant False.
+*/
+
 bool isValidNumber(vector<vector<int>>& Grid){
     int count0 = 0;
     int count1 = 0;
@@ -68,6 +78,16 @@ bool isValidNumber(vector<vector<int>>& Grid){
     return true;
 }
 
+/**
+*@brief Cette fonction vérifie qu'aucune de nos lignes ou colonnes ne contiennent plus de deux valeurs identiques consécutives. 
+*@param une grille à vérifier : Grid
+*@param 
+*@warning Cette fonction peut entraîner un comportement imprévisible si la taille de la grille est incorrecte ou trop fréquemment générée.
+
+*@return True si nos règles de parités sont respectées, le cas échéant False.
+*/
+
+
 bool isValidBoard(const vector<vector<int>>& Grid)
 {
     for(int i = 0; i < SIZE; i++){
@@ -83,6 +103,14 @@ bool isValidBoard(const vector<vector<int>>& Grid)
     return true;
 }
 
+
+/**
+*@brief Cette fonction nous sert à comparer toutes les lignes et les colonnes les unes avec les autres, elle compulse les regles de similarité, de validité et d'alignement. 
+*@param une grille à vérifier : Grid
+*@warning Cette fonction peut entraîner un comportement imprévisible si la taille de la grille est incorrecte ou trop fréquemment générée.
+
+*@return True si notre règle de validité est respectée,  le cas échéant False.
+*/
 
 bool isValid(const vector<vector<int>>& Grid) {
   for(int i = 0; i < SIZE; i++){
@@ -119,6 +147,10 @@ bool isValid(const vector<vector<int>>& Grid) {
 //end rules
 
 
+/**
+ * @brief Cette fonction à pour objectif de réinitialiser les trois grilles (TrueGrid, ActualGrid, HiddenGrid).
+ */
+ 
 void clearGrid()
 { 
   //dependant de size
@@ -145,7 +177,9 @@ void clearGrid()
 }
 
 
-//generate valid TrueGrid
+/**
+ * @brief Cette fonction est majeure elle génère une grille valide de manière aléatoire selon les règles de Takuzu, expressèments vérifiées plus haut.
+ */
 void generateValidBoard(){
     while(!isValid(TrueGrid) || !isValidNumber(TrueGrid))
     {
@@ -180,7 +214,10 @@ void generateValidBoard(){
 
 }
 
-// clone the board
+/**
+ * @brief Copie une grille dans HiddenGrid.
+ * @param OldGrid La grille source.
+ */
 void cloneToHiddenBoard(vector<vector<int>> OldGrid){
     for(int i = 0; i < SIZE; i++){
         for(int j = 0; j < SIZE; j++){
@@ -189,6 +226,11 @@ void cloneToHiddenBoard(vector<vector<int>> OldGrid){
     }
 }
 
+
+/**
+ * @brief Copie une grille dans ActualGrid.
+ * @param OldGrid La grille source.
+ */
 void cloneActualBoard(vector<vector<int>> OldGrid){
     for(int i = 0; i < SIZE; i++){
         for(int j = 0; j < SIZE; j++){
@@ -197,6 +239,12 @@ void cloneActualBoard(vector<vector<int>> OldGrid){
     }
 }
 // remove value (to a 7) if the value here cannot be change (only one possibility of completiun) (but not working because next ca be also change so need to check taht latter)
+
+/**
+ * @brief Remplace une valeur de la grille par 7 si elle est imposée et non ambigüe.
+ * @param i Ligne
+ * @param j Colonne
+ */
 void removeValue(int i, int j){
 
     if (HiddenGrid[i][j] != 7) {
@@ -211,19 +259,33 @@ void removeValue(int i, int j){
 
 }
 
-
+/**
+ * @brief Définit la taille de la grille utilisée dans le jeu. Cette fonction sera exploiter et appelé dans R via l'interface Shiny, pour changer dynamiquement la valeur de la grille dans l'interface. 
+ * @param size La taille à utiliser.
+ */
 // [[Rcpp::export]]
 void SetSize(int size)
 {
     SIZE = size;
 }
 
+/**
+ * @brief Récupère la taille actuelle de la grille.
+ * @return La taille de la grille.
+ */
+ 
 // [[Rcpp::export]]
 int GetSize()
 {
     return SIZE;
 }
 
+
+/**
+ * @brief Affiche la grille dans la console (debug).
+ * @param Grid La grille à afficher.
+ */
+ 
 // print board enter in parameter of the void
 void printBoard(vector<vector<int>>& Grid){
     for(int i = 0; i < SIZE; i++){
@@ -235,6 +297,11 @@ void printBoard(vector<vector<int>>& Grid){
     std::cout << std::endl;
 }
 
+/**
+ * @brief Remplit une case vide aléatoire avec sa valeur correcte issue de TrueGrid.
+ * @param grid La grille à modifier.
+ * @param iteration Limiteur de récursion.
+ */
 void changeValue(vector<vector<int>>& grid, int iteration){
     if (iteration > SIZE * SIZE * SIZE)
     {
@@ -255,7 +322,10 @@ void changeValue(vector<vector<int>>& grid, int iteration){
     }
 }
 
-
+/**
+ * @brief Fonction principale de génération d'une nouvelle grille de Takuzu.
+ */
+ 
 // [[Rcpp::export]]
 void mainGenerate()
 {    
@@ -282,13 +352,26 @@ void mainGenerate()
     //printBoard(ActualGrid);
 
 }
-
+/**
+ * @brief Récupère la valeur d'une case dans la grille de jeu.
+ * @param i Ligne
+ * @param j Colonne
+ * @return La valeur actuelle de la case
+ */
+ 
 // [[Rcpp::export]]
 int GetCaseValue(int i, int j)
 {
     return ActualGrid[i][j];
 }
 
+/**
+ * @brief Change la valeur d'une cellule cliquée par l'utilisateur dans ActualGrid.
+ *        Respecte les règles de modification (seulement les cases modifiables).
+ * @param i Ligne
+ * @param j Colonne
+ */
+ 
 // [[Rcpp::export]]
 void PlayerChangeValue(int i, int j)
 {
@@ -322,7 +405,10 @@ void PlayerChangeValue(int i, int j)
         }
     }
 }
-
+/**
+ * @brief Point d'entrée du programme .
+ * @return 0
+ */
 int main(){
     return 0;
 }
