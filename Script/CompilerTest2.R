@@ -17,8 +17,8 @@ library(Rcpp)
 #' 
 #' @param file Le chemin vers le fichier C++ à charger.
 #' @export
-#sourceCpp("/home/x/Projets_GIT/Projet_R_M1/Script/OtherTakuzu.cpp")
-sourceCpp("~/Documents/git/Projet_R_M1/Script/OtherTakuzu.cpp")
+sourceCpp("/home/mickael/Projets_GIT/Projet_R_M1/Script/OtherTakuzu.cpp")
+#sourceCpp("~/Documents/git/Projet_R_M1/Script/OtherTakuzu.cpp")
 
 ui <- fluidPage(
   titlePanel("Welcome To Takuzu² LM"),
@@ -115,11 +115,14 @@ server <- function(input, output, session) {
           lapply(1:fixed_size, function(j) {
             value <- GetCaseValue(i - 1, j - 1)  # Valeur actuelle de la cellule
             text_color <- ifelse(value == 7, "white", "black")  # Choix de la couleur du texte
+            #Définition du fond pour les cellules déja remplies à la création:
+            background_col <- if (value %in% c(0,1))"lightgray" else "white"
+            
             
             actionButton(
               inputId = paste0("cell_", i, "_", j),  # ID unique pour chaque cellule
               label = as.character(value),  # Affichage de la valeur
-              style = paste0("color: ", text_color, "; width: 50px; height: 50px; font-size: 20px; box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);")
+              style = paste0("color: ", text_color, ";", "background-color: ",background_col,";", "width: 50px; height: 50px; font-size: 20px; box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);")
             )
           })
         )
