@@ -21,34 +21,92 @@
                                                                       #sourceCpp("~/Documents/git/Projet_R_M1/Script/OtherTakuzu.cpp")
                                                                       
                                                                       ui <- fluidPage(
-                                                                        titlePanel("Welcome To Takuzu² LM"),
+                                                                        tags$head(
+                                                                          tags$style(HTML("
+      body {
+        background-color: #f4f4f4;
+      }
+
+      .main-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: 100vh;
+        padding-top: 40px;
+      }
+
+      .takuzu-card {
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        padding: 30px;
+        width: fit-content;
+      }
+
+      .fancy-button {
+        font-size: 18px;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #6EC1E4, #217CA3);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+      }
+
+      .fancy-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
+      }
+
+      .dropdown-select {
+        margin-bottom: 20px;
+      }
+
+      .takuzu-grid {
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+    "))
+                                                                        ),
                                                                         
-                                                                        # Sélection de la taille de la grille
-                                                                        selectInput("grid_size", "Choisir la taille de la grille:", 
-                                                                                    choices = c("Facile 6x6" = 6, "Moyen 8x8" = 8, "Expert 10x10" = 10, "Impossible 14x14" = 14),
-                                                                                    selected = 8),
+                                                                        div(class = "main-container",
+                                                                            div(class = "takuzu-card",
+                                                                                titlePanel("Welcome To Takuzu² LM"),
+                                                                                
+                                                                                # Sélection de la taille de la grille
+                                                                                div(class = "dropdown-select",
+                                                                                    selectInput("grid_size", "Choisir la taille de la grille:", 
+                                                                                                choices = c("Facile 6x6" = 6, "Moyen 8x8" = 8, "Expert 10x10" = 10, "Impossible 14x14" = 14),
+                                                                                                selected = 8)
+                                                                                ),
+                                                                                
+                                                                                # Espace pour afficher la grille du jeu
+                                                                                div(class = "takuzu-grid", uiOutput("gameGrid")),
+                                                                                
+                                                                                # Bouton "Un coup de main ?"
+                                                                                actionButton("help2_btn", "Un coup de main ?", class = "fancy-button")
+                                                                            )
+                                                                        ),
                                                                         
-                                                                        # Espace pour afficher la grille du jeu
-                                                                        uiOutput("gameGrid"),
-                                                                        
-                                                                        # Bouton "?" pour afficher les règles
+                                                                        # Bouton "?" pour afficher les règles, toujours en haut à droite
                                                                         actionButton("help_btn", "?", style = "
-                                                                          font-size: 20px; 
-                                                                          height: 50px; 
-                                                                          width: 50px; 
-                                                                          background-color: lightgray; 
-                                                                          color: black; 
-                                                                          border: none; 
-                                                                          border-radius: 50%; 
-                                                                          position: fixed; 
-                                                                          top: 10px; 
-                                                                          right: 10px; 
-                                                                          box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);
-                                                                          transition: all 0.3s ease;
-                                                                        "),
-                                                                        
-                                                                      actionButton("help2_btn","Un coup de main ?")
+    font-size: 20px; 
+    height: 50px; 
+    width: 50px; 
+    background-color: lightgray; 
+    color: black; 
+    border: none; 
+    border-radius: 50%; 
+    position: fixed; 
+    top: 10px; 
+    right: 10px; 
+    box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  ")
                                                                       )
+                                                                      
                                                                       
                                                                       server <- function(input, output, session) {
                                                                         

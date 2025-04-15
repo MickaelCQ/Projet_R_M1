@@ -405,6 +405,18 @@ void PlayerChangeValue(int i, int j)
         }
     }
 }
+
+/**
+ * @brief Fonction qui va permettre en exploitant la fonction changeValue d'aider l'utilisateur en remplissant à la volée une cellule aléatoirement, l'utilisation de changeValue est pertinence ici car elle ne touche qu'aux cellules toujours . (on ne touche pas ç HiddenGrid comme cela pas de conflits possibles, et on peut aussi modifier la difficulté sans impacté son comportement.)
+ */
+
+//[[Rcpp::export]]
+void HelpPlayer()
+{
+changeValue(ActualGrid,0);
+}
+
+
 /**
  * @brief Point d'entrée du programme .
  * @return 0
