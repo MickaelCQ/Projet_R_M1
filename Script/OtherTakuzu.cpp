@@ -406,6 +406,87 @@ void PlayerChangeValue(int i, int j)
     }
 }
 
+
+// [[Rcpp::export]]
+bool CheckVictory() {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (ActualGrid[i][j] == 7) {
+                return false;
+            }
+        }
+    }
+
+    return isValidNumber(ActualGrid) && isValidBoard(ActualGrid) && isValid(ActualGrid);
+}
+
+
+// [[Rcpp::export]]
+Rcpp::List GetErrorCells() {
+    Rcpp::List errors;
+
+    // Erreurs 3 identiques d'affilée
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (i > 1 && ActualGrid[i][j] == ActualGrid[i - 1][j] && ActualGrid[i][j] == ActualGrid[i - 2][j] && ActualGrid[i][j] != 7) {
+                errors.push_back(Rcpp::IntegerVector::create(i, j));
+                errors.push_back(Rcpp::IntegerVector::create(i - 1, j));
+                errors.push_back(Rcpp::IntegerVector::create(i - 2, j));
+            }
+            if (j > 1 && ActualGrid[i][j] == ActualGrid[i][j - 1] && ActualGrid[i][j] == ActualGrid[i][j - 2] && ActualGrid[i][j] != 7) {
+                errors.push_back(Rcpp::IntegerVector::create(i, j));
+                errors.push_back(Rcpp::IntegerVector::create(i, j - 1));
+                errors.push_back(Rcpp::IntegerVector::create(i, j - 2));
+            }
+        }
+    }
+
+    // Erreurs de parité
+    for (int i = 0; i < SIZE; i++) {
+        int count0 = 0, count1 = 0, unknown = 0;
+        for (int j = 0; j < SIZE; j++) {
+            if (ActualGrid[i][j] == 0) count0++;
+            else if (ActualGrid[i][j] == 1) count1++;
+            else unknown++;
+        }
+        if (unknown == 0 && count0 > SIZE / 2 || count1 > SIZE / 2) {
+            for (int j = 0; j < SIZE; j++) {
+                errors.push_back(Rcpp::IntegerVector::create(i, j));
+            }
+        }
+    }
+
+    // Lignes ou colonnes identiques
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = i + 1; j < SIZE; j++) {
+            bool sameRow = true, sameCol = true;
+            for (int k = 0; k < SIZE; k++) {
+                if (ActualGrid[i][k] == 7 || ActualGrid[j][k] == 7) sameRow = false;
+                if (ActualGrid[k][i] == 7 || ActualGrid[k][j] == 7) sameCol = false;
+                if (ActualGrid[i][k] != ActualGrid[j][k]) sameRow = false;
+                if (ActualGrid[k][i] != ActualGrid[k][j]) sameCol = false;
+            }
+            if (sameRow) {
+                for (int k = 0; k < SIZE; k++) {
+                    errors.push_back(Rcpp::IntegerVector::create(i, k));
+                    errors.push_back(Rcpp::IntegerVector::create(j, k));
+                }
+            }
+            if (sameCol) {
+                for (int k = 0; k < SIZE; k++) {
+                    errors.push_back(Rcpp::IntegerVector::create(k, i));
+                    errors.push_back(Rcpp::IntegerVector::create(k, j));
+                }
+            }
+        }
+    }
+
+    return errors;
+}
+
+
+
+
 /**
  * @brief Fonction qui va permettre en exploitant la fonction changeValue d'aider l'utilisateur en remplissant à la volée une cellule aléatoirement, l'utilisation de changeValue est pertinence ici car elle ne touche qu'aux cellules toujours . (on ne touche pas ç HiddenGrid comme cela pas de conflits possibles, et on peut aussi modifier la difficulté sans impacté son comportement.)
  */
