@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['setsize_26',['SetSize',['../OtherTakuzu_8cpp.html#a321dad1fe802272570d900c816b71358',1,'SetSize(int size):&#160;OtherTakuzu.cpp'],['../TakuzuRulesV3_8cpp.html#a321dad1fe802272570d900c816b71358',1,'SetSize(int size):&#160;TakuzuRulesV3.cpp']]],
-  ['size_27',['SIZE',['../working__cpp_8cpp.html#a70ed59adcb4159ac551058053e649640',1,'SIZE():&#160;working_cpp.cpp'],['../OtherTakuzu_8cpp.html#a121b8bab5c0ceda3e33140d406f4887e',1,'SIZE():&#160;OtherTakuzu.cpp'],['../TakuzuRulesV3_8cpp.html#a121b8bab5c0ceda3e33140d406f4887e',1,'SIZE():&#160;TakuzuRulesV3.cpp']]]
+  ['r_5finit_5ftakuzumickaelloikpackage_30',['R_init_TakuzuMickaelLoikPackage',['../RcppExports_8cpp.html#a6a396e9f93e0be52b7ab69526e6619c1',1,'RcppExports.cpp']]],
+  ['rcppexports_2ecpp_31',['RcppExports.cpp',['../RcppExports_8cpp.html',1,'']]],
+  ['rcppexports_2er_32',['RcppExports.R',['../RcppExports_8R.html',1,'']]],
+  ['removevalue_33',['removeValue',['../OtherTakuzu_8cpp.html#a579013cd312b120e5367a269c4600b10',1,'removeValue(int i, int j):&#160;OtherTakuzu.cpp'],['../TakuzuMickaelLoikPackage_2src_2OtherTakuzu_8cpp.html#a579013cd312b120e5367a269c4600b10',1,'removeValue(int i, int j):&#160;OtherTakuzu.cpp']]]
 ];

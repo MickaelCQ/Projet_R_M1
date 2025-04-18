@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['main_20',['main',['../OtherTakuzu_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;OtherTakuzu.cpp'],['../TakuzuRulesV3_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;TakuzuRulesV3.cpp']]],
-  ['maingenerate_21',['mainGenerate',['../OtherTakuzu_8cpp.html#a77b57fed25c0892c39c3ef5d7f823981',1,'OtherTakuzu.cpp']]]
+  ['isvalid_22',['isValid',['../OtherTakuzu_8cpp.html#a235c71e73303d0e2acb51119cc4cac18',1,'isValid(const vector&lt; vector&lt; int &gt;&gt; &amp;Grid):&#160;OtherTakuzu.cpp'],['../TakuzuMickaelLoikPackage_2src_2OtherTakuzu_8cpp.html#a235c71e73303d0e2acb51119cc4cac18',1,'isValid(const vector&lt; vector&lt; int &gt;&gt; &amp;Grid):&#160;OtherTakuzu.cpp']]],
+  ['isvalidboard_23',['isValidBoard',['../OtherTakuzu_8cpp.html#ad001a81c8411c9d26830aa3c0e56de24',1,'isValidBoard(const vector&lt; vector&lt; int &gt;&gt; &amp;Grid):&#160;OtherTakuzu.cpp'],['../TakuzuMickaelLoikPackage_2src_2OtherTakuzu_8cpp.html#ad001a81c8411c9d26830aa3c0e56de24',1,'isValidBoard(const vector&lt; vector&lt; int &gt;&gt; &amp;Grid):&#160;OtherTakuzu.cpp']]],
+  ['isvalidnumber_24',['isValidNumber',['../OtherTakuzu_8cpp.html#a082be0ed97f7e974e545b3995da53c34',1,'isValidNumber(const vector&lt; vector&lt; int &gt;&gt; &amp;Grid):&#160;OtherTakuzu.cpp'],['../TakuzuMickaelLoikPackage_2src_2OtherTakuzu_8cpp.html#a082be0ed97f7e974e545b3995da53c34',1,'isValidNumber(const vector&lt; vector&lt; int &gt;&gt; &amp;Grid):&#160;OtherTakuzu.cpp']]]
 ];

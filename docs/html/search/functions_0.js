@@ -1,8 +1,12 @@
 var searchData=
 [
-  ['change_5fval_37',['change_val',['../working__cpp_8cpp.html#af468ae51aa1006340a3b88e1a72eb51b',1,'working_cpp.cpp']]],
-  ['changevalue_38',['changeValue',['../OtherTakuzu_8cpp.html#afd0afc996b0e38decffd4f85cba21c98',1,'OtherTakuzu.cpp']]],
-  ['cleargrid_39',['clearGrid',['../OtherTakuzu_8cpp.html#ad28c8c932b46ed4bce19748ba7106599',1,'OtherTakuzu.cpp']]],
-  ['cloneactualboard_40',['cloneActualBoard',['../OtherTakuzu_8cpp.html#a81b33efaa3ad2edcdfb68f87b19e5242',1,'cloneActualBoard(vector&lt; vector&lt; int &gt;&gt; OldGrid):&#160;OtherTakuzu.cpp'],['../TakuzuRulesV3_8cpp.html#a063c07088064f96dc81f5ec51e49bedd',1,'cloneActualBoard(vector&lt; vector&lt; int &gt;&gt; &amp;OldGrid):&#160;TakuzuRulesV3.cpp']]],
-  ['clonetohiddenboard_41',['cloneToHiddenBoard',['../OtherTakuzu_8cpp.html#a36863a6c40570811cabd97e451a5a775',1,'cloneToHiddenBoard(vector&lt; vector&lt; int &gt;&gt; OldGrid):&#160;OtherTakuzu.cpp'],['../TakuzuRulesV3_8cpp.html#ac5e185d2cf5d47f31395a3097bae72e8',1,'cloneToHiddenBoard(vector&lt; vector&lt; int &gt;&gt; &amp;OldGrid):&#160;TakuzuRulesV3.cpp']]]
+  ['_5ftakuzumickaelloikpackage_5fcheckvictory_42',['_TakuzuMickaelLoikPackage_CheckVictory',['../RcppExports_8cpp.html#ab84f77d4b12281fef7c5cfe1f2ae3bbc',1,'RcppExports.cpp']]],
+  ['_5ftakuzumickaelloikpackage_5fgetcasevalue_43',['_TakuzuMickaelLoikPackage_GetCaseValue',['../RcppExports_8cpp.html#a705a9f5b6c749ccdcb406541a4a52c1d',1,'RcppExports.cpp']]],
+  ['_5ftakuzumickaelloikpackage_5fgeterrorcells_44',['_TakuzuMickaelLoikPackage_GetErrorCells',['../RcppExports_8cpp.html#ae0524822bce306aaa2152f98b740c6d8',1,'RcppExports.cpp']]],
+  ['_5ftakuzumickaelloikpackage_5fgethiddencasevalue_45',['_TakuzuMickaelLoikPackage_GetHiddenCaseValue',['../RcppExports_8cpp.html#a1a5f09d43e00c42829456c493a2088b3',1,'RcppExports.cpp']]],
+  ['_5ftakuzumickaelloikpackage_5fgetsize_46',['_TakuzuMickaelLoikPackage_GetSize',['../RcppExports_8cpp.html#a3ab980570655e0717f50fad4c22ff0e6',1,'RcppExports.cpp']]],
+  ['_5ftakuzumickaelloikpackage_5fhelpplayer_47',['_TakuzuMickaelLoikPackage_HelpPlayer',['../RcppExports_8cpp.html#abb323cf36b12d4fb35628c339fb71f8e',1,'RcppExports.cpp']]],
+  ['_5ftakuzumickaelloikpackage_5fmaingenerate_48',['_TakuzuMickaelLoikPackage_mainGenerate',['../RcppExports_8cpp.html#a4c9c6b925d0356bd72e653f11f6c1588',1,'RcppExports.cpp']]],
+  ['_5ftakuzumickaelloikpackage_5fplayerchangevalue_49',['_TakuzuMickaelLoikPackage_PlayerChangeValue',['../RcppExports_8cpp.html#a1bd4c336cc20d37e55267859fb6909a2',1,'RcppExports.cpp']]],
+  ['_5ftakuzumickaelloikpackage_5fsetsize_50',['_TakuzuMickaelLoikPackage_SetSize',['../RcppExports_8cpp.html#a2230cd1b54a4ef5a1b5189e13c0bc102',1,'RcppExports.cpp']]]
 ];

@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['takuzurulesv3_2ecpp_28',['TakuzuRulesV3.cpp',['../TakuzuRulesV3_8cpp.html',1,'']]],
-  ['truegrid_29',['TrueGrid',['../OtherTakuzu_8cpp.html#a0dd77e044d8e647bfb4a703aa9987863',1,'TrueGrid():&#160;OtherTakuzu.cpp'],['../TakuzuRulesV3_8cpp.html#a0dd77e044d8e647bfb4a703aa9987863',1,'TrueGrid():&#160;TakuzuRulesV3.cpp']]]
+  ['setsize_34',['SetSize',['../OtherTakuzu_8cpp.html#a321dad1fe802272570d900c816b71358',1,'SetSize(int size):&#160;OtherTakuzu.cpp'],['../TakuzuMickaelLoikPackage_2src_2OtherTakuzu_8cpp.html#a321dad1fe802272570d900c816b71358',1,'SetSize(int size):&#160;OtherTakuzu.cpp'],['../RcppExports_8cpp.html#a321dad1fe802272570d900c816b71358',1,'SetSize(int size):&#160;OtherTakuzu.cpp']]],
+  ['size_35',['SIZE',['../OtherTakuzu_8cpp.html#a121b8bab5c0ceda3e33140d406f4887e',1,'SIZE():&#160;OtherTakuzu.cpp'],['../TakuzuMickaelLoikPackage_2src_2OtherTakuzu_8cpp.html#a121b8bab5c0ceda3e33140d406f4887e',1,'SIZE():&#160;OtherTakuzu.cpp']]]
 ];

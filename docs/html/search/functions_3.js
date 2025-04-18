@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['main_54',['main',['../OtherTakuzu_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;OtherTakuzu.cpp'],['../TakuzuRulesV3_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;TakuzuRulesV3.cpp']]],
-  ['maingenerate_55',['mainGenerate',['../OtherTakuzu_8cpp.html#a77b57fed25c0892c39c3ef5d7f823981',1,'OtherTakuzu.cpp']]]
+  ['helpplayer_61',['HelpPlayer',['../OtherTakuzu_8cpp.html#ac235b0af4b6cb2302a95ea3eadd7c65d',1,'HelpPlayer(int iteration):&#160;OtherTakuzu.cpp'],['../TakuzuMickaelLoikPackage_2src_2OtherTakuzu_8cpp.html#ac235b0af4b6cb2302a95ea3eadd7c65d',1,'HelpPlayer(int iteration):&#160;OtherTakuzu.cpp'],['../RcppExports_8cpp.html#ac235b0af4b6cb2302a95ea3eadd7c65d',1,'HelpPlayer(int iteration):&#160;OtherTakuzu.cpp']]]
 ];
