@@ -8,6 +8,12 @@ L'objectif pédagogique de ce jeu étant d'exploiter et de mettre en oeuvre les 
 
 Nous espérons que vous apprécierez jouer à notre jeu !
 
+### En français :
+Si vous souhaitez exécuter le jeu directement depuis le terminal, vous pouvez utiliser la commande suivante (plus en détails a la fin):
+
+```bash
+Rscript -e "shiny::runApp('Takuzulm.R')"
+```
 
 ### In English:
 **Takuzu² LM** is an educational project between Mickaël and Loïk, Master's students in Bioinformatics under the supervision of Professor JM Marin. We are very excited to present version 1.0.0 of our Takuzu game, a logic puzzle where you must fill a grid with binary values {0,1} while ensuring compliance with several parity and symmetry rules.
@@ -90,9 +96,6 @@ To play this Takuzu game, follow these steps:
 ### En français :
 Si vous souhaitez exécuter le jeu directement depuis le terminal, vous pouvez utiliser la commande suivante :
 ## Commande d'exécution (en bash)
-
-### En français :
-Si vous souhaitez exécuter le jeu directement depuis le terminal, vous pouvez utiliser la commande suivante :
 
 ```bash
 Rscript -e "shiny::runApp('Takuzulm.R')"
