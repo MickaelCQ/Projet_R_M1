@@ -134,18 +134,21 @@ observe({
             new_value <- GetCaseValue(row - 1, col - 1)
   
             updateActionButton(session, button_id, label = as.character(new_value))
-              size <- reactive_size()
+            size <- reactive_size()
 
               for (i2 in 1:size) {
                 for (j2 in 1:size) {
                   val <- GetCaseValue(i2 - 1, j2 - 1)
-                  session$sendCustomMessage("changeColor", list(id = paste0("cell_", i2, "_", j2), value = val, error = FALSE))
+                  is_fixed <- GetHiddenCaseValue(i2 - 1, j2 - 1) != 7  # Vérifie si la case est fixe
+
+                if (is_fixed) {
+                    session$sendCustomMessage("changeColor", list(id = paste0("cell_", i2, "_", j2), value = val, error = FALSE, fixed = TRUE))
+                } else {
+                    session$sendCustomMessage("changeColor", list(id = paste0("cell_", i2, "_", j2), value = val, error = FALSE, fixed = FALSE))
+                }
                 }
               }
 
-              # Coloration normale
-              session$sendCustomMessage("changeColor", list(id = button_id, value = new_value, error = FALSE))
-  
               # Affichage des cellules fautives
               error_cells <- GetErrorCells()
               for (cell in error_cells) {
@@ -167,6 +170,7 @@ observe({
     }
     }
 })
+
 output$gameGrid <- renderUI({
     fixed_size <- reactive_size()  # Récupération de la taille actuelle de la grille
     Help_trigger()  # Permet le RenderUI à se recalculer (en forcant voir si il y'a pas mieux)
@@ -175,6 +179,10 @@ output$gameGrid <- renderUI({
         Shiny.addCustomMessageHandler('changeColor', function(message) {
         var button = document.getElementById(message.id);
         if (button) {
+        if (message.fixed) {
+            button.style.backgroundColor = 'lightgray';
+            button.style.color = 'black';
+        } else {
             if (message.value == 1) {
               button.style.backgroundColor = 'lightblue';
               button.style.color = 'black';
@@ -191,13 +199,14 @@ output$gameGrid <- renderUI({
               button.style.backgroundColor = 'white';
               button.style.color = 'black';
             }
-
-            if (message.error) {
-              button.style.backgroundColor = 'red';
-              button.style.color = 'white';
-            }
         }
-        });
+
+        if (message.error) {
+          button.style.backgroundColor = 'red';
+          button.style.color = 'white';
+        }
+       }
+      });
     ")),
     # Création dynamique de la grille en fonction de la taille
     lapply(1:fixed_size, function(i) {
