@@ -110,7 +110,9 @@ server <- function(input, output, session) {
   
   # Taille de la grille réactive
   grid_size <- reactiveVal(8)  # Valeur par défaut de la taille
-  
+    hand_count <- reactiveVal(0)
+    start_time <- Sys.time()
+
   # Mise à jour de la grille lors du changement de taille
   observe({
     cat("Resize")
@@ -158,10 +160,16 @@ server <- function(input, output, session) {
             
             # Victoire 
             if (CheckVictory()) {
-              showModal(modalDialog(
-                title = " Victoire !",
-                "Félicitations ! Vous avez complété la grille correctement !",
-              ))
+                elapsed_time <- difftime(Sys.time(), start_time, units = "secs")
+
+                showModal(modalDialog(
+                  title = " Victoire !",
+                  paste0("Bravo ! \n",
+                  "Statistiques :\n",
+                  "- Vous avez utilisé : ", hand_count(), " coups de main\n",
+                  "- Vous avez utilisé : ", round(elapsed_time, 2), " secondes.",
+                  "Pour relancer une partie, relancez le jeu !"),
+                ))
             }
           })
         })
@@ -263,7 +271,7 @@ server <- function(input, output, session) {
   # Affichage des règles du jeu
   observeEvent(input$help_btn, {
     showModal(modalDialog(
-      title = "Bienvenue sur le Jeu Takuzu de x et y",
+      title = "Bienvenue sur le Jeu Takuzu de Loik Galtier et Mickael Coquerelle",
       "Quelques éléments de compréhension pour vous aider :\n\n",
       "- Remplissez la grille avec des zéros et des uns en respectant ces règles :\n\n",
       "- Chaque ligne et colonne doit contenir un nombre égal de 0 et de 1.\n\n",

@@ -114,28 +114,28 @@ bool isValid(const vector<vector<int>>& Grid) {
  */
  
 void clearGrid()
-{ 
+{
   //dependant de size
-  //creer les trois grilles et vide chaque case
-  
+ //creer les trois grilles et vide chaque case
+
   TrueGrid.clear();
-  ActualGrid.clear();
-  HiddenGrid.clear();
-  
-  
-  TrueGrid.resize(SIZE);
-  ActualGrid.resize(SIZE);
-  HiddenGrid.resize(SIZE);
-  for(int i = 0; i < SIZE; i++){
-    TrueGrid[i].resize(SIZE);
-    ActualGrid[i].resize(SIZE);
-    HiddenGrid[i].resize(SIZE);
-    for (int j = 0; j < SIZE; j++)
-    {
-      TrueGrid[i][j] = 6;
-    }
-    
-  }
+      ActualGrid.clear();
+      HiddenGrid.clear();
+
+
+      TrueGrid.resize(SIZE);
+      ActualGrid.resize(SIZE);
+      HiddenGrid.resize(SIZE);
+      for(int i = 0; i < SIZE; i++){
+            TrueGrid[i].resize(SIZE);
+            ActualGrid[i].resize(SIZE);
+            HiddenGrid[i].resize(SIZE);
+            for (int j = 0; j < SIZE; j++)
+            {
+                  TrueGrid[i][j] = 6;
+            }
+     }
+
 }
 
 
@@ -304,12 +304,9 @@ void mainGenerate()
         }
     }
 
-    for (int i = 0; i < SIZE * 1; i++){ // Here change for the difficulty and the size of board // ex EZ : Size * 3, ex Hard : Size * 1
+    for (int i = 0; i < SIZE * 1.5; i++){ // Here change for the difficulty and the size of board // ex EZ : Size * 3, ex Hard : Size * 1
         changeValue(HiddenGrid, 0); // also be used for help when player blocked
     }
-    
-    printBoard(HiddenGrid);
-    printBoard(TrueGrid);
     cloneActualBoard(HiddenGrid);
     //printBoard(ActualGrid);
 
