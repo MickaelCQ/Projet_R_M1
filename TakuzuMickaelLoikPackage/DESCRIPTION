@@ -1,0 +1,8 @@
+Package: TakuzuMickaelLoikPackage
+Type: Package
+Title: Takuzu Game by Loik and Mickael
+Version: 1.0.0
+Author: Loik Galtier, Mickael Coquerelle
+Description: Un jeu de takuzu réalisé pour le projet R, de l'UE HAX815X
+License: CC BY-SA 4.0
+LinkingTo: Rcpp

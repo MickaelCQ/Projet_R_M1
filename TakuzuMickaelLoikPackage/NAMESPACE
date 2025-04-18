@@ -1,0 +1,2 @@
+useDynLib(TakuzuMickaelLoikPackage)
+export(SetSize, GetSize, GetCaseValue, GetHiddenCaseValue, PlayerChangeValue, CheckVictory, GetErrorCells, HelpPlayer, mainGenerate)

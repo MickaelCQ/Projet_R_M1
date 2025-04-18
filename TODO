@@ -1,8 +1,3 @@
-- BUG generation grille (go on a vector)
-- Menu  start, Avec bouton pour lancer la partie avec des paramtre like seed ou size
-- fond rouge lorsque erreur, soit tt le fond, soit la case (pt bonus si tu peut colorier selon l'erreur (exemple, les trois case rouge si trois d'affiler, ligne rouge si plus de 0 qque de 1, les deux lignes concernée si deux lignes identique)).
+- bug double observer
 - Faire une crise d'épilepsie si la grille est entiérement remplie sans erreur.
-- Bouton d'aide qui fait apparaitre une valeur.
 - Selectoin taille grille : 6, 8, 10, 12, 14, 16, 18
-- timer pour le speed run
-- Change value color to white if seven (pt bonus si en remplace le visuel par des"X" "O" et " ").
