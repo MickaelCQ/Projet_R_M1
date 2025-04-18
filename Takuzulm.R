@@ -110,8 +110,8 @@ server <- function(input, output, session) {
   
   # Taille de la grille réactive
   grid_size <- reactiveVal(8)  # Valeur par défaut de la taille
-    hand_count <- reactiveVal(0)
-    start_time <- Sys.time()
+  hand_count <- reactiveVal(0)
+  observerCreated <- reactiveValues()  #
 
   # Mise à jour de la grille lors du changement de taille
   observe({
@@ -119,7 +119,8 @@ server <- function(input, output, session) {
     fixed_size <- grid_size()  # Taille actuelle
     SetSize(fixed_size)  # Mise à jour de la taille dans le C++ (via SetSize)
     mainGenerate()  # Génération de la grille après changement de taille
-    
+
+    start_time <- Sys.time()
     # Ajout d'un observeEvent pour chaque cellule (dynamiquement)
     for (i in 1:fixed_size) {
       for (j in 1:fixed_size) {
@@ -127,8 +128,12 @@ server <- function(input, output, session) {
           row <- i
           col <- j
           button_id <- paste0("cell_", row, "_", col)
-          
+
+         if (!is.null(observerCreated[[button_id]])) {
+           return()  # Passer si l'observateur existe déjà
+         }
           # Observer chaque cellule pour un changement de valeur lorsqu'on clique
+          observerCreated[[button_id]] <- TRUE
           observeEvent(input[[button_id]], {
             PlayerChangeValue(row - 1, col - 1)
             new_value <- GetCaseValue(row - 1, col - 1)
