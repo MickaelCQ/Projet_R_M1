@@ -23,58 +23,20 @@ vector<vector<int>> HiddenGrid;
 
 *@return True si nos règles de parités sont respectées, le cas échéant False.
 */
+bool isValidNumber(const vector<vector<int>>& Grid) {
+    for (int i = 0; i < SIZE; i++) {
+        int count0Row = 0, count1Row = 0, count0Col = 0, count1Col = 0;
+        for (int j = 0; j < SIZE; j++) {
+            if (Grid[i][j] == 7 || Grid[j][i] == 7) return true;
 
-bool isValidNumber(vector<vector<int>>& Grid){
-    int count0 = 0;
-    int count1 = 0;
-    for(int i = 0; i < SIZE; i++){
-      for(int j = 0; j < SIZE; j++){
-          if(Grid[i][j] == 7)
-          {
-              return true;
-          }
-          if(Grid[i][j] == 0){
-              count0++;
-          }
-          else if(Grid[i][j] == 1){
-              count1++;
-          }
-      }
-      if(count0 != count1)
-        {
-          return false;
+            if (Grid[i][j] == 0) count0Row++;
+            else if (Grid[i][j] == 1) count1Row++;
+
+            if (Grid[j][i] == 0) count0Col++;
+            else if (Grid[j][i] == 1) count1Col++;
         }
-      else
-      {
-        count0 = 0;
-        count1 = 0;
-      }
+        if (count0Row != count1Row || count0Col != count1Col) return false;
     }
-    
-    for(int i = 0; i < SIZE; i++){
-      for(int j = 0; j < SIZE; j++){
-        if(Grid[j][i] == 7)
-        {
-          return true;
-        }
-        if(Grid[j][i] == 0){
-          count0++;
-        }
-        else if(Grid[j][i] == 1){
-          count1++;
-        }
-      }
-      if(count0 != count1)
-      {
-        return false;
-      }
-      else
-      {
-        count0 = 0;
-        count1 = 0;
-      }
-    }
-    
     return true;
 }
 
@@ -197,7 +159,7 @@ void generateValidBoard(){
                     {
                         TrueGrid[i][j] = 1 - TrueGrid[i][j];
                     }
-                    
+
                 } else if(count0 < SIZE / 2){
                     TrueGrid[i][j] = 0;
                 } else {
