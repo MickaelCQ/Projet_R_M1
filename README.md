@@ -11,6 +11,13 @@ Nous espérons que vous apprécierez jouer à notre jeu !
 ### En français :
 Si vous souhaitez exécuter le jeu directement depuis le terminal, vous pouvez utiliser la commande suivante (plus en détails a la fin):
 
+
+```bash
+./run_takuzu.sh
+```
+
+ou encore
+
 ```bash
 Rscript -e "shiny::runApp('Takuzulm.R')"
 ```
@@ -81,7 +88,7 @@ Pour jouer à ce jeu Takuzu, suivez les étapes ci-dessous :
 
 1. Clonez ou téléchargez le repository.
 2. Installez les dépendances nécessaires, notamment **R**, **Shiny** et **Rcpp**.
-3. Chargez votre fichier `Takuzulm.R` dans R.
+3. Chargez votre fichier `Takuzulm.R` dans R ou utilisez le lanceur "run_takuzu.sh".
 4. Exécutez le script pour lancer l'application Shiny et commencez à jouer !
 
 ### In English:
@@ -89,13 +96,19 @@ To play this Takuzu game, follow these steps:
 
 1. Clone or download the repository.
 2. Install the necessary dependencies, including **R**, **Shiny**, and **Rcpp**.
-3. Load the `Takuzulm.R` script in R.
+3. Load the `Takuzulm.R` script in R or use the launcher "run_takuzu.sh".
 4. Run the script to launch the Shiny app and start playing!
 ## Commande d'exécution (en bash)
 
 ### En français :
 Si vous souhaitez exécuter le jeu directement depuis le terminal, vous pouvez utiliser la commande suivante :
 ## Commande d'exécution (en bash)
+
+```bash
+./run_takuzu.sh
+```
+
+ou encore
 
 ```bash
 Rscript -e "shiny::runApp('Takuzulm.R')"

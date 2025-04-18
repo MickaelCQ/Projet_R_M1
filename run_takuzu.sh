@@ -9,7 +9,7 @@ rm -f takuzu.log
 nohup Rscript Takuzulm.R > takuzu.log 2>&1 &
 
 # Attendre un peu que ça démarre
-sleep 3
+sleep 10
 
 # Vérifier si une erreur est survenue
 if grep -qi "Error" takuzu.log; then
