@@ -167,11 +167,9 @@ observe({
     }
     }
 })
-                                                                        
-# Mise à jour de la grille affichée
 output$gameGrid <- renderUI({
     fixed_size <- reactive_size()  # Récupération de la taille actuelle de la grille
-    Help_trigger()  # Permet le RenderUI a se recalculer (en forcant voir si il y'a pas mieux)
+    Help_trigger()  # Permet le RenderUI à se recalculer (en forcant voir si il y'a pas mieux)
     tagList(
     tags$script(HTML("
         Shiny.addCustomMessageHandler('changeColor', function(message) {
@@ -180,7 +178,7 @@ output$gameGrid <- renderUI({
             if (message.value == 1) {
               button.style.backgroundColor = 'lightblue';
               button.style.color = 'black';
-            } 
+            }
             else if (message.value == 0) {
               button.style.backgroundColor = 'lightgreen';
               button.style.color = 'black';
@@ -188,7 +186,7 @@ output$gameGrid <- renderUI({
             else if (message.value == 7) {
               button.style.backgroundColor = 'white';
               button.style.color = 'white';
-            } 
+            }
             else {
               button.style.backgroundColor = 'white';
               button.style.color = 'black';
@@ -207,17 +205,18 @@ output$gameGrid <- renderUI({
         lapply(1:fixed_size, function(j) {
             value <- GetCaseValue(i - 1, j - 1)  # Valeur actuelle de la cellule
             text_color <- ifelse(value == 7, "white", "black")  # Choix de la couleur du texte
-            #Définition du fond pour les cellules déja remplies à la création:
-            background_col <- if (value %in% c(0,1))"lightgray" else "white"
-                                                                                  
-            #On fige la couleur et pas de modificaiton possible après la génération
-            disabled <- if (value %in% c(0, 1)) TRUE else FALSE
-                                                                                  
-                                                                                  
+
+            # Vérification si la case est fixe dans HiddenGrid
+            is_fixed <- GetHiddenCaseValue(i - 1, j - 1) != 7  # Fonction C++ à implémenter
+            background_col <- if (is_fixed) "lightgray" else "white"
+
+            # On fige la couleur et pas de modification possible après la génération
+            disabled <- if (is_fixed) TRUE else FALSE
+
             actionButton(
             inputId = paste0("cell_", i, "_", j),  # ID unique pour chaque cellule
             label = as.character(value),  # Affichage de la valeur
-            style = paste0("color: ", text_color, ";", "background-color: ",background_col,";", "width: 50px; height: 50px; font-size: 20px; box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);"), disabled = disabled
+            style = paste0("color: ", text_color, ";", "background-color: ", background_col, ";", "width: 50px; height: 50px; font-size: 20px; box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);"), disabled = disabled
             )
         })
         )
@@ -241,23 +240,13 @@ observeEvent(input$help_btn, {
 })
                                                                         
 Help_trigger <- reactiveVal(0) # Pour actualiser avec un accumulateur si l'utilisateur demande de l'aide
-                                                                        
-  
+
+
 observeEvent(input$help2_btn,{
-    HelpPlayer() #Récupération de la fonction qui exploite le comportement de ChangeValue
-    size <- reactive_size()
-    cat("Taille utilisée dans help2 :", size, "\n")
-    grid_matrix <- matrix(0, nrow=size, ncol=size) 
-    for(i in 0:(size - 1)){
-    for(j in 0:(size - 1)){
-        grid_matrix[i + 1, j + 1] <- GetCaseValue(i, j)
-    }
-    }
-    #On actualise la grille, si le joueur appuie sur le bouton d'aide :
-    Help_trigger(Help_trigger()+1)
-    #grid_matrix_reactive(grid_matrix)#On actualise la grille affichée
+    HelpPlayer(0) #Récupération de la fonction qui exploite le comportement de ChangeValue
+    Help_trigger(Help_trigger() + 1) # Incrémentation de l'accumulateur
 })
-                                                                        
+
 }#fin de la partie serveur.
-                                                              
+
 shinyApp(ui, server)

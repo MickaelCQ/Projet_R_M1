@@ -365,6 +365,13 @@ int GetCaseValue(int i, int j)
     return ActualGrid[i][j];
 }
 
+
+// [[Rcpp::export]]
+int GetHiddenCaseValue(int i, int j)
+{
+    return HiddenGrid[i][j];
+}
+
 /**
  * @brief Change la valeur d'une cellule cliquée par l'utilisateur dans ActualGrid.
  *        Respecte les règles de modification (seulement les cases modifiables).
@@ -492,9 +499,26 @@ Rcpp::List GetErrorCells() {
  */
 
 //[[Rcpp::export]]
-void HelpPlayer()
+void HelpPlayer(int iteration)
 {
-changeValue(ActualGrid,0);
+    if (iteration > SIZE * SIZE * SIZE)
+    {
+        std::cout << "you don't have luck bro" << std::endl;
+        return;
+    }
+
+    int i = rand() % SIZE;
+    int j = rand() % SIZE;
+    if(HiddenGrid[i][j] != 0 && HiddenGrid[i][j] != 1){
+        HiddenGrid[i][j] = TrueGrid[i][j];
+        ActualGrid[i][j] = TrueGrid[i][j];
+        std::cout << "changed by : " << TrueGrid[i][j] << endl;
+        return;
+    }
+    else
+    {
+        HelpPlayer(iteration + 1);
+    }
 }
 
 
