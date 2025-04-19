@@ -81,7 +81,7 @@ ui <- fluidPage(
         canvas.style.display = 'none';
 
         var chars = '01=+-×÷π∞Σ√∫∂≠≤≥∑'.split('');
-        var fontSize = 18;
+        var fontSize = 22;
         var columns = canvas.width / fontSize;
         var drops = [];
         for (var x = 0; x < columns; x++)
@@ -105,7 +105,7 @@ ui <- fluidPage(
           }
         }
 
-        setInterval(draw, 50);
+        setInterval(draw, 100);
 
         window.addEventListener('resize', function() {
           canvas.width = window.innerWidth;
@@ -250,8 +250,23 @@ server <- function(input, output, session) {
     grid_size(as.numeric(input$grid_size))
     SetSize(grid_size())
     mainGenerate()
-    game_started(TRUE)
-  })
+    size <- grid_size()
+      for (i in 1:size) {
+        for (j in 1:size) {
+          val <- GetCaseValue(i - 1, j - 1) # Récupère la valeur visible
+          is_fixed <- GetHiddenCaseValue(i - 1, j - 1) != 7 # Vérifie si la case est fixe
+          session$sendCustomMessage("changeColor", list(
+            id = paste0("cell_", i, "_", j),
+            value = val,
+            error = FALSE,
+            fixed = is_fixed,
+            nightMode = NightMode()
+          ))
+        }
+      }
+
+      game_started(TRUE)
+    })
 
     observeEvent(input$toggleBtn, {
       NightMode(!NightMode()) # Inverse l'état
