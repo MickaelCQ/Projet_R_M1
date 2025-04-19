@@ -415,8 +415,22 @@ Rcpp::List GetErrorCells() {
             else if (ActualGrid[i][j] == 1) count1++;
             else unknown++;
         }
-        if (unknown == 0 && count0 > SIZE / 2 || count1 > SIZE / 2) {
+        if (unknown == 0 && (count0 > SIZE / 2 || count1 > SIZE / 2)) {
             for (int j = 0; j < SIZE; j++) {
+                errors.push_back(Rcpp::IntegerVector::create(i, j));
+            }
+        }
+    }
+
+    for (int j = 0; j < SIZE; j++) {
+        int count0 = 0, count1 = 0, unknown = 0;
+        for (int i = 0; i < SIZE; i++) {
+            if (ActualGrid[i][j] == 0) count0++;
+            else if (ActualGrid[i][j] == 1) count1++;
+            else unknown++;
+        }
+        if (unknown == 0 && (count0 > SIZE / 2 || count1 > SIZE / 2)) {
+            for (int i = 0; i < SIZE; i++) {
                 errors.push_back(Rcpp::IntegerVector::create(i, j));
             }
         }
