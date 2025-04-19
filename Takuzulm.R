@@ -1,30 +1,37 @@
-#' Application Shiny pour le jeu Takuzu avec Rcpp
+#' @file app.R
+#' @brief Application Shiny du jeu Takuzu avec logique en C++ via Rcpp et fond animé JavaScript sur le thème des mathématiques.
 #'
-#' Cette application Shiny permet de jouer au jeu Takuzu. Elle utilise des fonctions C++ via Rcpp pour gérer la logique du jeu.
-#' L'interface permet à l'utilisateur de cliquer sur des cellules de la grille et de modifier leur valeur.
-#'
-#' @import shiny
-#' @import Rcpp
-#' @export
-#'
+#' Cette application permet de jouer à Takuzu avec une interface moderne. Le fond animé utilise un canvas HTML5 avec des chiffres mathématiques animés.
+
 library(shiny)
 library(Rcpp)
 
-
-#' Charger le fichier C++ avec les fonctions nécessaires
-#'
-#' Charge le fichier C++ contenant les règles du jeu Takuzu.
-#' 
-#' @param file Le chemin vers le fichier C++ à charger.
-#' @export
-#sourceCpp("/home/m/Projets_GIT/Projet_R_M1/Script/OtherTakuzu.cpp")
+#' @brief Charge le script C++ contenant la logique du jeu Takuzu
+#' @param file Chemin du fichier C++ (ici relatif au répertoire du projet)
+#' @return Aucune valeur de retour
 sourceCpp("./OtherTakuzu.cpp")
 
+# UI
 ui <- fluidPage(
   tags$head(
+    # Styles CSS
     tags$style(HTML("
+      html, body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      canvas#background {
+        position: fixed;
+        z-index: -1;
+        top: 0;
+        left: 0;
+      }
+
       body {
-        background-color: #f4f4f4;
+        background-color: transparent;
+        font-family: 'Courier New', monospace;
       }
 
       .main-container {
@@ -37,7 +44,7 @@ ui <- fluidPage(
       }
 
       .takuzu-card {
-        background-color: white;
+        background-color: rgba(255, 255, 255, 0.9);
         border-radius: 15px;
         box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
         padding: 30px;
@@ -59,69 +66,130 @@ ui <- fluidPage(
         transform: scale(1.05);
         box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
       }
+    ")),
+    # JavaScript d'animation fond mathématique
+    tags$script(HTML("
+      document.addEventListener('DOMContentLoaded', function() {
+        var canvas = document.createElement('canvas');
+        canvas.id = 'background';
+        document.body.appendChild(canvas);
 
-      .dropdown-select {
-        margin-bottom: 20px;
+        var ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        canvas.style.display = 'none';
+
+        var chars = '01=+-×÷π∞Σ√∫∂≠≤≥∑'.split('');
+        var fontSize = 18;
+        var columns = canvas.width / fontSize;
+        var drops = [];
+        for (var x = 0; x < columns; x++)
+          drops[x] = Math.random() * canvas.height;
+
+        function draw() {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          ctx.fillStyle = '#00ff99';
+          ctx.font = fontSize + 'px monospace';
+
+          for (var i = 0; i < drops.length; i++) {
+            var text = chars[Math.floor(Math.random() * chars.length)];
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+              drops[i] = 0;
+
+            drops[i]++;
+          }
+        }
+
+        setInterval(draw, 50);
+
+        window.addEventListener('resize', function() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        });
+      });
+    ")),
+    tags$script(HTML("
+      // Fonction pour afficher/masquer le canvas
+      Shiny.addCustomMessageHandler('toggleBackground', function(enabled) {
+        var canvas = document.getElementById('background');
+        if (canvas) {
+          canvas.style.display = enabled ? 'block' : 'none';
+        }
+      });
+    ")),
+    tags$style(HTML("
+      #toggleBtn {
+        font-size: 14px;
+        height: 40px;
+        width: 100px;
+        background-color: lightgray;
+        color: black;
+        border: none;
+        border-radius: 5px;
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
       }
-
-      .takuzu-grid {
-        margin-top: 20px;
-        margin-bottom: 20px;
+      #toggleBtn:hover {
+        transform: scale(1.1);
+        box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
       }
     "))
   ),
-  
+
   div(class = "main-container",
       div(class = "takuzu-card",
           titlePanel("Welcome To Takuzu² LM"),
-          
-          # Sélection de la taille de la grille
           uiOutput("sizeSelector"),
-          
-          # Espace pour afficher la grille du jeu (sera rendu uniquement après validation du choix de la taille)
           uiOutput("gameGrid"),
-          
-          # Bouton "Un coup de main ?" (sera affiché uniquement après validation du choix de la taille)
-          uiOutput("helpButton")
+          uiOutput("helpButton"),
+
+            actionButton("toggleBtn", "matrix ?", class = "fancy-button")
       )
   ),
-  
-  # Bouton "?" pour afficher les règles, toujours en haut à droite
   actionButton("help_btn", "?", style = "
-    font-size: 20px; 
-    height: 50px; 
-    width: 50px; 
-    background-color: lightgray; 
-    color: black; 
-    border: none; 
-    border-radius: 50%; 
-    position: fixed; 
-    top: 10px; 
-    right: 10px; 
+    font-size: 20px;
+    height: 50px;
+    width: 50px;
+    background-color: lightgray;
+    color: black;
+    border: none;
+    border-radius: 50%;
+    position: fixed;
+    top: 10px;
+    right: 10px;
     box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
   ")
 )
 
+#' @brief Partie serveur de l'application Shiny
+#' @param input Entrées utilisateur
+#' @param output Objets UI dynamiques à rendre
+#' @param session Session utilisateur en cours
+#' @return Aucun
 server <- function(input, output, session) {
-  
-  # Variable pour contrôler l'état du jeu
   game_started <- reactiveVal(FALSE)
-  
-  # Taille de la grille réactive
-  grid_size <- reactiveVal(8)  # Valeur par défaut de la taille
+  grid_size <- reactiveVal(8)
   hand_count <- reactiveVal(0)
-  observerCreated <- reactiveValues()  #
+  observerCreated <- reactiveValues()
+  Help_trigger <- reactiveVal(0)
+  NightMode <- reactiveVal(FALSE)
 
-  # Mise à jour de la grille lors du changement de taille
+
   observe({
-    cat("Resize")
-    fixed_size <- grid_size()  # Taille actuelle
-    SetSize(fixed_size)  # Mise à jour de la taille dans le C++ (via SetSize)
-    mainGenerate()  # Génération de la grille après changement de taille
-
+    fixed_size <- grid_size()
+    SetSize(fixed_size)
+    mainGenerate()
     start_time <- Sys.time()
-    # Ajout d'un observeEvent pour chaque cellule (dynamiquement)
+
     for (i in 1:fixed_size) {
       for (j in 1:fixed_size) {
         local({
@@ -129,136 +197,128 @@ server <- function(input, output, session) {
           col <- j
           button_id <- paste0("cell_", row, "_", col)
 
-         if (!is.null(observerCreated[[button_id]])) {
-           return()  # Passer si l'observateur existe déjà
-         }
-          # Observer chaque cellule pour un changement de valeur lorsqu'on clique
+          if (!is.null(observerCreated[[button_id]])) return()
           observerCreated[[button_id]] <- TRUE
+
           observeEvent(input[[button_id]], {
             PlayerChangeValue(row - 1, col - 1)
             new_value <- GetCaseValue(row - 1, col - 1)
-            
             updateActionButton(session, button_id, label = as.character(new_value))
+
             size <- grid_size()
-            
             for (i2 in 1:size) {
               for (j2 in 1:size) {
                 val <- GetCaseValue(i2 - 1, j2 - 1)
-                is_fixed <- GetHiddenCaseValue(i2 - 1, j2 - 1) != 7  # Vérifie si la case est fixe
-                
-                if (is_fixed) {
-                  session$sendCustomMessage("changeColor", list(id = paste0("cell_", i2, "_", j2), value = val, error = FALSE, fixed = TRUE))
-                } else {
-                  session$sendCustomMessage("changeColor", list(id = paste0("cell_", i2, "_", j2), value = val, error = FALSE, fixed = FALSE))
-                }
+                is_fixed <- GetHiddenCaseValue(i2 - 1, j2 - 1) != 7
+                session$sendCustomMessage("changeColor", list(id = paste0("cell_", i2, "_", j2), value = val, error = FALSE, fixed = is_fixed, nightMode = NightMode()))
               }
             }
-            
-            # Affichage des cellules fautives
+
             error_cells <- GetErrorCells()
             for (cell in error_cells) {
               i <- cell[1] + 1
               j <- cell[2] + 1
               val <- GetCaseValue(i - 1, j - 1)
-              session$sendCustomMessage("changeColor", list(id = paste0("cell_", i, "_", j), value = val, error = TRUE))
+              session$sendCustomMessage("changeColor", list(id = paste0("cell_", i, "_", j), value = val, error = TRUE, nightMode = NightMode()))
             }
-            
-            # Victoire 
-            if (CheckVictory()) {
-                elapsed_time <- difftime(Sys.time(), start_time, units = "secs")
 
-                showModal(modalDialog(
-                  title = " Victoire !",
-                  paste0("Bravo ! \n",
-                  "Statistiques :\n",
-                  "- Vous avez utilisé : ", hand_count(), " coups de main\n",
-                  "- Vous avez utilisé : ", round(elapsed_time, 2), " secondes.",
-                  "Pour relancer une partie, relancez le jeu !"),
-                ))
+            if (CheckVictory()) {
+              elapsed_time <- difftime(Sys.time(), start_time, units = "secs")
+              showModal(modalDialog(
+                title = "Victoire !",
+                paste0("Bravo !\n- Coups de main utilisés : ", hand_count(), "\n- Temps écoulé : ", round(elapsed_time, 2), " secondes.")
+              ))
             }
           })
         })
       }
     }
   })
-  
+
   output$sizeSelector <- renderUI({
     if (!game_started()) {
       tagList(
-        selectInput("grid_size", "Choisir la taille de la grille :", 
-                    choices = c("Facile 6x6" = 6, "Moyen 8x8" = 8, "Expert 10x10" = 10, "Impossible 14x14" = 14),
-                    selected = NULL),
+        selectInput("grid_size", "Choisir la taille de la grille :",
+                    choices = c("Facile 6x6" = 6, "Moyen 8x8" = 8, "Expert 10x10" = 10, "Impossible 14x14" = 14)),
         actionButton("start_game_btn", "Valider", class = "fancy-button")
       )
     }
   })
-  
-  # Démarre le jeu lorsque le bouton "Valider" est cliqué
+
   observeEvent(input$start_game_btn, {
-    req(input$grid_size)  # S'assurer qu’une taille est choisie
+    req(input$grid_size)
     grid_size(as.numeric(input$grid_size))
     SetSize(grid_size())
     mainGenerate()
     game_started(TRUE)
   })
-  
-  # Affichage de la grille et du bouton "Un coup de main ?" uniquement après validation du choix de la taille
+
+    observeEvent(input$toggleBtn, {
+      NightMode(!NightMode()) # Inverse l'état
+      session$sendCustomMessage("toggleBackground", NightMode()) # Envoie l'état au JS
+      size <- grid_size()
+      for (i2 in 1:size) {
+        for (j2 in 1:size) {
+          val <- GetCaseValue(i2 - 1, j2 - 1)
+          is_fixed <- GetHiddenCaseValue(i2 - 1, j2 - 1) != 7
+          session$sendCustomMessage("changeColor", list(id = paste0("cell_", i2, "_", j2), value = val, error = FALSE, fixed = is_fixed, nightMode = NightMode()))
+        }
+      }
+    })
+
   output$gameGrid <- renderUI({
     if (game_started()) {
-      fixed_size <- grid_size()  # Récupération de la taille actuelle de la grille
-      Help_trigger()  # Permet le RenderUI à se recalculer (en forcant voir si il y'a pas mieux)
+      fixed_size <- grid_size()
+      Help_trigger()
       tagList(
         tags$script(HTML("
-          Shiny.addCustomMessageHandler('changeColor', function(message) {
-          var button = document.getElementById(message.id);
-          if (button) {
-          if (message.fixed) {
-              button.style.backgroundColor = 'lightgray';
-              button.style.color = 'black';
-          } else {
-              if (message.value == 1) {
-                button.style.backgroundColor = 'lightblue';
-                button.style.color = 'black';
-              }
-              else if (message.value == 0) {
-                button.style.backgroundColor = 'lightgreen';
-                button.style.color = 'black';
-              }
-              else if (message.value == 7) {
-                button.style.backgroundColor = 'white';
-                button.style.color = 'white';
-              }
-              else {
-                button.style.backgroundColor = 'white';
-                button.style.color = 'black';
-              }
-          }
+             Shiny.addCustomMessageHandler('changeColor', function(message) {
+                 var button = document.getElementById(message.id);
 
-          if (message.error) {
-            button.style.backgroundColor = 'red';
-            button.style.color = 'white';
-          }
-         }
-        });
-      ")),
-        # Création dynamique de la grille en fonction de la taille
+                 if (button) {
+                   if (message.fixed) {
+                     button.style.backgroundColor = message.nightMode ? 'black' : 'lightgray';
+                     button.style.color = message.nightMode ? 'white' : 'black';
+                   } else {
+                     if (message.value == 1) {
+                       button.style.backgroundColor = message.nightMode ? 'darkblue' : 'lightblue';
+                       button.style.color = message.nightMode ? 'white' : 'black';
+                     }
+                     else if (message.value == 0) {
+                       button.style.backgroundColor = message.nightMode ? 'darkgreen' : 'lightgreen';
+                       button.style.color = message.nightMode ? 'white' : 'black';
+                     }
+                     else if (message.value == 7) {
+                       button.style.backgroundColor = message.nightMode ? 'lightgray' : 'white';
+                       button.style.color = message.nightMode ? 'lightgray' : 'white';
+                     }
+                     else {
+                       button.style.backgroundColor = message.nightMode ? 'black' : 'white';
+                       button.style.color = message.nightMode ? 'white' : 'black';
+                     }
+                   }
+
+                   if (message.error) {
+                     button.style.backgroundColor = message.nightMode ? 'darkred' : 'red';
+                     button.style.color = 'white';
+                   }
+                 }
+               });
+        ")),
         lapply(1:fixed_size, function(i) {
           fluidRow(
             lapply(1:fixed_size, function(j) {
-              value <- GetCaseValue(i - 1, j - 1)  # Valeur actuelle de la cellule
-              text_color <- ifelse(value == 7, "white", "black")  # Choix de la couleur du texte
-              
-              # Vérification si la case est fixe dans HiddenGrid
-              is_fixed <- GetHiddenCaseValue(i - 1, j - 1) != 7  # Fonction C++ à implémenter
+              value <- GetCaseValue(i - 1, j - 1)
+              is_fixed <- GetHiddenCaseValue(i - 1, j - 1) != 7
+              text_color <- ifelse(value == 7, "white", "black")
               background_col <- if (is_fixed) "lightgray" else "white"
-              
-              # On fige la couleur et pas de modification possible après la génération
               disabled <- if (is_fixed) TRUE else FALSE
-              
+
               actionButton(
-                inputId = paste0("cell_", i, "_", j),  # ID unique pour chaque cellule
-                label = as.character(value),  # Affichage de la valeur
-                style = paste0("color: ", text_color, ";", "background-color: ", background_col, ";", "width: 50px; height: 50px; font-size: 20px; box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);"), disabled = disabled
+                inputId = paste0("cell_", i, "_", j),
+                label = as.character(value),
+                style = paste0("color: ", text_color, "; background-color: ", background_col, "; width: 50px; height: 50px; font-size: 20px; box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);"),
+                disabled = disabled
               )
             })
           )
@@ -266,35 +326,28 @@ server <- function(input, output, session) {
       )
     }
   })
-  
+
   output$helpButton <- renderUI({
     if (game_started()) {
       actionButton("help2_btn", "Un coup de main ?", class = "fancy-button")
     }
   })
-  
-  # Affichage des règles du jeu
+
   observeEvent(input$help_btn, {
     showModal(modalDialog(
       title = "Bienvenue sur le Jeu Takuzu de Loik Galtier et Mickael Coquerelle",
-      "Quelques éléments de compréhension pour vous aider :\n\n",
-      "- Remplissez la grille avec des zéros et des uns en respectant ces règles :\n\n",
-      "- Chaque ligne et colonne doit contenir un nombre égal de 0 et de 1.\n\n",
-      "- Aucune ligne ou colonne ne peut être identique à une autre.\n\n",
-      "- Chaque case peut être modifiée en cliquant dessus.\n\n",
-      "- Vous gagnez lorsque toutes les règles sont respectées ! Bonne chance !",
+      "Quelques règles à respecter :\n\n- Nombre égal de 0 et de 1 par ligne et colonne\n- Pas plus de deux chiffres identiques à la suite\n- Aucune ligne/colonne ne peut être identique à une autre\n- Cliquez pour modifier les cases\n\nBonne chance !",
       easyClose = TRUE,
       footer = modalButton("Fermer")
     ))
   })
-  
-  Help_trigger <- reactiveVal(0) # Pour actualiser avec un accumulateur si l'utilisateur demande de l'aide
-  
-  observeEvent(input$help2_btn,{
-    HelpPlayer(0) #Récupération de la fonction qui exploite le comportement de ChangeValue
-    Help_trigger(Help_trigger() + 1) # Incrémentation de l'accumulateur
-  })
-  
-} #fin de la partie serveur.
 
+  observeEvent(input$help2_btn, {
+    HelpPlayer(0)
+    Help_trigger(Help_trigger() + 1)
+  })
+}
+
+#' @brief Lance l'application Shiny Takuzu
 shinyApp(ui, server)
+
